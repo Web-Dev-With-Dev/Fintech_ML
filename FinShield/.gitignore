@@ -1,0 +1,96 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+.installed.cfg
+lib/
+lib64/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# ML model artifacts
+models/saved/
+*.pkl
+*.pt
+*.pth
+*.onnx
+*.h5
+*.joblib
+
+# Datasets (generated)
+data_engine/datasets/
+*.csv
+*.json
+*.parquet
+*.gpickle
+
+# Evaluation outputs
+evaluate/outputs/
+*.png
+*.pdf
+
+# Audio files
+*.wav
+*.mp3
+*.ogg
+*.m4a
+*.flac
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Whisper model cache
+~/.cache/whisper/
+
+# HuggingFace cache
+~/.cache/huggingface/
+
+# pytest
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# mypy
+.mypy_cache/
+
+# Distribution
+*.tar.gz
+*.zip

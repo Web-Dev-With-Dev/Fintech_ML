@@ -1,8 +1,11 @@
+import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Dict, Any, Tuple
 import logging
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from models.federated.fl_client import (
     create_up_client,

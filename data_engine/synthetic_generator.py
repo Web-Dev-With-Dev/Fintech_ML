@@ -89,10 +89,10 @@ class ScamDataGenerator:
             self.scam_templates[lang] = {}
             for cat in self.categories:
                 self.scam_templates[lang][cat] = [
-                    f"Scam {cat} msg in {lang} variant 1: Click {url} or call {phone}",
-                    f"Scam {cat} msg in {lang} variant 2: Pay Rs {amount} at {url}",
-                    f"Scam {cat} msg in {lang} variant 3: Your account {ac_num} is blocked. Link: {url}",
-                    f"Scam {cat} msg in {lang} variant 4: Share OTP {otp} for {cat}"
+                    "Scam {cat} msg in {lang} variant 1: Click {url} or call {phone}".replace("{cat}", cat).replace("{lang}", lang),
+                    "Scam {cat} msg in {lang} variant 2: Pay Rs {amount} at {url}".replace("{cat}", cat).replace("{lang}", lang),
+                    "Scam {cat} msg in {lang} variant 3: Your account {ac_num} is blocked. Link: {url}".replace("{cat}", cat).replace("{lang}", lang),
+                    "Scam {cat} msg in {lang} variant 4: Share OTP {otp} for {cat}".replace("{cat}", cat).replace("{lang}", lang)
                 ]
                 
     def _inject_noise(self, text: str) -> str:

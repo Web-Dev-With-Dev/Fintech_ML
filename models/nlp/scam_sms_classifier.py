@@ -119,25 +119,60 @@ class ScamSMSClassifier:
         logger.info(f"Model loaded from {path}")
 
 
+
+# ─── Dataset paths (relative to project root /datasets/) ─────────────────────
+DATASET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'datasets')
+
+SMS_SPAM_COLLECTION = os.path.join(DATASET_DIR, 'SMSSpamCollection')   # UCI tab-separated
+SPAM_CSV            = os.path.join(DATASET_DIR, 'spam.csv')             # Kaggle CSV
+
+
+def load_sms_datasets() -> pd.DataFrame:
+    """Load and merge UCI SMSSpamCollection + Kaggle spam.csv into a unified DataFrame."""
+    frames = []
+
+    # 1. UCI SMSSpamCollection (tab-separated: label\tmessage)
+    if os.path.exists(SMS_SPAM_COLLECTION):
+        uci = pd.read_csv(
+            SMS_SPAM_COLLECTION, sep='\t', header=None,
+            names=['label_raw', 'text'], encoding='latin-1'
+        )
+        uci['label'] = uci['label_raw'].map({'spam': 1, 'ham': 0})
+        uci['lang']  = 'en'
+        frames.append(uci[['text', 'label', 'lang']])
+        logger.info(f"Loaded UCI SMSSpamCollection: {len(uci)} rows")
+    else:
+        logger.warning(f"UCI dataset not found at {SMS_SPAM_COLLECTION}")
+
+    # 2. Kaggle spam.csv (columns: v1=label, v2=text)
+    if os.path.exists(SPAM_CSV):
+        kaggle = pd.read_csv(SPAM_CSV, encoding='latin-1')[['v1', 'v2']]
+        kaggle.columns = ['label_raw', 'text']
+        kaggle['label'] = kaggle['label_raw'].map({'spam': 1, 'ham': 0})
+        kaggle['lang']  = 'en'
+        frames.append(kaggle[['text', 'label', 'lang']])
+        logger.info(f"Loaded Kaggle spam.csv: {len(kaggle)} rows")
+    else:
+        logger.warning(f"Kaggle spam.csv not found at {SPAM_CSV}")
+
+    if not frames:
+        raise FileNotFoundError(
+            "No SMS datasets found in /datasets/. "
+            "Expected: SMSSpamCollection and/or spam.csv"
+        )
+
+    df = pd.concat(frames, ignore_index=True).dropna(subset=['label', 'text'])
+    df['label'] = df['label'].astype(int)
+    logger.info(f"Combined dataset: {len(df)} rows | Scam rate: {df['label'].mean():.2%}")
+    return df
+
+
 if __name__ == '__main__':
     logger.info("Initializing ScamSMSClassifier pipeline...")
     classifier = ScamSMSClassifier()
 
-    data = {
-        'text': [
-            "Your bank account is blocked. Update KYC immediately via http://fake.com",
-            "Hey, let's meet for lunch tomorrow.",
-            "You won a prize! Call now.",
-            "Meeting at 5 PM",
-            "Aapka account band ho gaya hai, OTP share karein",
-            "Aaj khana khane chalein?",
-            "Dear customer your SBI account will be suspended click http://sbi-kyc.tk now",
-            "Please find the attached invoice for your review",
-        ],
-        'lang':  ['en', 'en', 'en', 'en', 'hi', 'hi', 'en', 'en'],
-        'label': [1,    0,    1,    0,    1,    0,    1,    0]
-    }
-    df = pd.DataFrame(data)
+    # ── Load real datasets from /datasets/ ──────────────────────────────────
+    df = load_sms_datasets()
 
     X_train, X_test, y_train, y_test, lang_train, lang_test = train_test_split(
         df['text'].tolist(), df['label'].tolist(), df['lang'].tolist(),
@@ -155,3 +190,4 @@ if __name__ == '__main__':
         os.path.dirname(os.path.abspath(__file__)), '..', 'saved', 'scam_sms_classifier.pkl'
     )
     classifier.save(save_path)
+

@@ -38,7 +38,7 @@ FAKE_NBFCS = [
 
 class LoanScamDetector:
     def __init__(self):
-        self.model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+        self.model = xgb.XGBClassifier(eval_metric='logloss', random_state=42)
         self.is_trained = False
 
     def detect_fake_nbfc(self, text: str) -> Tuple[bool, str]:
@@ -73,15 +73,61 @@ class LoanScamDetector:
         ]])
 
     def train(self, dataset_path: str):
+        """
+        Train on CFPB complaints.csv from /datasets/.
+        Filters for loan/lending related complaints to build training data.
+        """
         logger.info(f"Loading dataset from {dataset_path}...")
-        texts = [
-            "Get 5 lakh loan with 0% interest. Pay processing fee upfront. No CIBIL.",
-            "Personal loan available. RBI registered NBFC. Standard interest rates apply.",
-            "Instant cash nbfc offers guaranteed approval via whatsapp only.",
-            "Bank loan approved. Visit branch for details."
-        ]
-        langs = ['en', 'en', 'en', 'en']
-        labels = [1, 0, 1, 0]
+
+        # ── Load CFPB Complaints dataset ──────────────────────────────────────
+        if os.path.exists(dataset_path):
+            try:
+                # CFPB complaints.csv is very large — load a sample
+                raw = pd.read_csv(
+                    dataset_path, encoding='latin-1',
+                    on_bad_lines='skip', nrows=50000,
+                    usecols=['Product', 'Consumer complaint narrative']
+                )
+                raw.columns = ['product', 'text']
+                raw = raw.dropna(subset=['text'])
+
+                # Label: 1=loan scam related, 0=other complaint
+                loan_keywords = [
+                    'processing fee', 'advance fee', 'no credit check',
+                    'guaranteed approval', 'upfront', 'no cibil', 'instant loan',
+                    'payday', 'predatory', 'unauthorized charge'
+                ]
+                raw['label'] = raw['text'].str.lower().apply(
+                    lambda t: 1 if any(kw in t for kw in loan_keywords) else 0
+                )
+
+                texts  = raw['text'].tolist()
+                langs  = ['en'] * len(texts)
+                labels = raw['label'].tolist()
+                pos = sum(labels)
+                logger.info(f"Loaded CFPB complaints: {len(texts)} rows | Loan scam: {pos} ({pos/len(texts):.2%})")
+
+            except Exception as e:
+                logger.warning(f"Could not parse CFPB dataset ({e}). Using mock data.")
+                texts  = [
+                    "Get 5 lakh loan with 0% interest. Pay processing fee upfront. No CIBIL.",
+                    "Personal loan available. RBI registered NBFC. Standard interest rates apply.",
+                    "Instant cash nbfc offers guaranteed approval via whatsapp only.",
+                    "Bank loan approved. Visit branch for details."
+                ]
+                langs  = ['en', 'en', 'en', 'en']
+                labels = [1, 0, 1, 0]
+        else:
+            logger.warning(f"Dataset not found at {dataset_path}. Using mock data.")
+            texts  = [
+                "Get 5 lakh loan with 0% interest. Pay processing fee upfront. No CIBIL.",
+                "Personal loan available. RBI registered NBFC. Standard interest rates apply.",
+                "Instant cash nbfc offers guaranteed approval via whatsapp only.",
+                "Bank loan approved. Visit branch for details."
+            ]
+            langs  = ['en', 'en', 'en', 'en']
+            labels = [1, 0, 1, 0]
+
         features_list = []
         for text, lang in zip(texts, langs):
             features = self.extract_features(text, lang)
@@ -89,11 +135,11 @@ class LoanScamDetector:
         X = np.array(features_list)
         y = np.array(labels)
         logger.info("Applying SMOTE...")
-        smote = SMOTE(random_state=42, k_neighbors=1)
+        smote = SMOTE(random_state=42, k_neighbors=min(1, sum(y) - 1) if sum(y) > 1 else 1)
         try:
             X_resampled, y_resampled = smote.fit_resample(X, y)
         except Exception as e:
-            logger.warning(f"SMOTE failed (likely due to tiny mock dataset), using original data. Error: {e}")
+            logger.warning(f"SMOTE failed ({e}), using original data.")
             X_resampled, y_resampled = X, y
         logger.info("Training XGBoost...")
         self.model.fit(X_resampled, y_resampled)
@@ -149,10 +195,16 @@ class LoanScamDetector:
             logger.warning(f"Model file not found at {path}")
 
 if __name__ == '__main__':
+    _DATASET_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'datasets')
+    _COMPLAINTS_CSV = os.path.join(_DATASET_DIR, 'complaints.csv')   # CFPB Complaints dataset
+
     detector = LoanScamDetector()
-    detector.train('dummy_path.csv')
+    detector.train(_COMPLAINTS_CSV)
+
     test_text = "Need money? PM Mudra Instant offers 5 lakh loan. No CIBIL. WhatsApp only. Pay processing fee."
     result = detector.predict(test_text, 'en')
     logger.info(f"Prediction result: {result}")
+
     save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'saved', 'loan_scam_detector.pkl')
     detector.save(save_path)
+

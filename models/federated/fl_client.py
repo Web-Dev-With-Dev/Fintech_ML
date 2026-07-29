@@ -13,10 +13,9 @@ except ImportError:
     NUMPY_CLIENT_CLASS = MockNumPyClient
 
 from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, log_loss
-from sklearn.utils import resample
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,20 +28,95 @@ class FinShieldFLClient(NUMPY_CLIENT_CLASS):
         self.local_data_path = local_data_path
         self.model_type = model_type
         self.model = Pipeline([
-            ('tfidf', TfidfVectorizer(max_features=1000)),
-            ('clf', LogisticRegression(max_iter=100, warm_start=True))
+            ('vectorizer', HashingVectorizer(n_features=128, alternate_sign=False)),
+            ('clf', LogisticRegression(max_iter=20, warm_start=True))
         ])
         self._load_local_data()
 
+    SCAM_TEMPLATES = {
+        "UP":    ["Aapka account band ho jayega OTP dijiye turant",
+                  "Aapko prize mila hai 50000 rupaye claim karein abhi",
+                  "SBI bank se bol rahe hain KYC update nahi hua account suspend hoga",
+                  "Lottery winner aap hain link pe click karein",
+                  "Ek baar OTP share karein account block nahi hoga"],
+        "Bihar": ["Aapka khata band hoga OTP batao jaldi",
+                  "Inam jeet liya hai turant link kholein",
+                  "Bank adhikari bol rahe hain KYC karo nahi to account freeze",
+                  "50000 ka prize claim karo abhi call karo",
+                  "OTP share karo account safe rahega"],
+        "TN":    ["Ungal account suspend aagum OTP kodunkal",
+                  "Neenga prize winner OTP paarunga link click pannunga",
+                  "Bank official pesugiren KYC update illana account block",
+                  "50000 rupay claim pannunga link la click pannunga",
+                  "Ungal OTP share pannunga account safe aagum"],
+        "WB":    ["Apnar account bondho hobe OTP din ekhoni",
+                  "Aapni prize jitechen link e click korun",
+                  "Bank official bolchi KYC update na hole account freeze",
+                  "50000 taka claim korun ekhoni call korun",
+                  "OTP share korun account safe thakbe"],
+        "MH":    ["Tumcha account band hoel OTP dya lagech",
+                  "Tumhi prize jinkla link var click kara",
+                  "Bank adhikari bolat ahet KYC update kara nahitar account suspend",
+                  "50000 rupaye claim kara abhi call kara",
+                  "OTP share kara account surakshit rahil"],
+    }
+
+    SAFE_TEMPLATES = {
+        "UP":    ["Aaj ka mausam bahut accha hai",
+                  "Dukaan se sabzi laana mat bhoolna",
+                  "Kal ka meeting rescheduled ho gaya hai",
+                  "Bhai ko call karo shaam ko",
+                  "Market se dudh laana hai aaj"],
+        "Bihar": ["Khana khake aana aaj",
+                  "Kal school bandh hai holiday hai",
+                  "Chacha ji ka birthday hai kal",
+                  "Raste mein traffic hai thoda late hoga",
+                  "Meeting 5 baje hai office mein"],
+        "TN":    ["Indru kaalai weather nalla irukku",
+                  "Kal school holiday irukku",
+                  "Kadaila paal vaanga marandhuvidathe",
+                  "Traffic jaasthi irukku konjam late aagalam",
+                  "Meeting 5 manikku office la irukku"],
+        "WB":    ["Aaj rasta onek jam ache",
+                  "Kal school bondho ache",
+                  "Bazaar theke dudh aneche",
+                  "Bhai ke phone koro bikel e",
+                  "Meeting ta 5 tar office e"],
+        "MH":    ["Aaj rasta khup jam ahe",
+                  "Udya school band ahe",
+                  "Bajar madhun dudh ana",
+                  "Bhavala phone kar sandhyakali",
+                  "Meeting 5 vajta office madhye ahe"],
+    }
+
     def _load_local_data(self) -> None:
-        np.random.seed(hash(self.client_id) % 2**32)
-        n_samples = np.random.randint(500, 2000)
-        self.X_train = [f"This is a sample message for {self.region} " + str(i) for i in range(n_samples)]
-        self.y_train = np.random.randint(0, 2, size=n_samples)
-        self.X_test = [f"This is a test message for {self.region} " + str(i) for i in range(n_samples // 5)]
-        self.y_test = np.random.randint(0, 2, size=n_samples // 5)
-        if not hasattr(self.model.named_steps['clf'], 'coef_'):
-            self.model.fit(self.X_train[:10], self.y_train[:10])
+        rng = np.random.default_rng(hash(self.client_id) % 2**32)
+        region = self.region
+        scam_pool = self.SCAM_TEMPLATES.get(region, self.SCAM_TEMPLATES["UP"]) * 40
+        safe_pool = self.SAFE_TEMPLATES.get(region, self.SAFE_TEMPLATES["UP"]) * 40
+
+        n_scam = int(rng.integers(200, 600))
+        n_safe = int(rng.integers(200, 600))
+
+        scam_idx = rng.integers(0, len(scam_pool), size=n_scam)
+        safe_idx  = rng.integers(0, len(safe_pool),  size=n_safe)
+
+        X_scam = [scam_pool[i] for i in scam_idx]
+        X_safe = [safe_pool[i]  for i in safe_idx]
+
+        X = X_scam + X_safe
+        y = np.array([1] * n_scam + [0] * n_safe)
+
+        shuffle_idx = rng.permutation(len(X))
+        X = [X[i] for i in shuffle_idx]
+        y = y[shuffle_idx]
+
+        split = int(0.8 * len(X))
+        self.X_train, self.X_test = X[:split], X[split:]
+        self.y_train, self.y_test = y[:split], y[split:]
+
+        self.model.fit(self.X_train, self.y_train)
+
 
     def get_parameters(self, config: Dict[str, str]) -> List[np.ndarray]:
         clf = self.model.named_steps['clf']
@@ -55,8 +129,8 @@ class FinShieldFLClient(NUMPY_CLIENT_CLASS):
         if not hasattr(clf, 'coef_'):
             self.model.fit(self.X_train[:2], self.y_train[:2])
         if len(parameters) == 2:
-            clf.coef_ = parameters[0]
-            clf.intercept_ = parameters[1]
+            clf.coef_ = np.array(parameters[0], copy=True)
+            clf.intercept_ = np.array(parameters[1], copy=True)
 
     def add_differential_privacy_noise(self, gradients: List[np.ndarray], epsilon: float = 1.0) -> List[np.ndarray]:
         noised_params = []
@@ -70,7 +144,7 @@ class FinShieldFLClient(NUMPY_CLIENT_CLASS):
             self.set_parameters(parameters)
         epochs = 5
         clf = self.model.named_steps['clf']
-        X_train_transformed = self.model.named_steps['tfidf'].transform(self.X_train)
+        X_train_transformed = self.model.named_steps['vectorizer'].transform(self.X_train)
         for epoch in range(epochs):
             clf.fit(X_train_transformed, self.y_train)
         updated_params = self.get_parameters(config={})

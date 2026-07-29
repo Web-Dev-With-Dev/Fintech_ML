@@ -40,9 +40,8 @@ if HAS_PYG:
             x2 = F.elu(x2 + x_res2)
             x2 = F.dropout(x2, p=0.3, training=self.training)
             
-            x3 = self.conv3(x2, edge_index)
-            
-            return torch.sigmoid(x3).squeeze()
+            logits = self.conv3(x2, edge_index)
+            return logits.squeeze()
 else:
     class FraudGATModel(nn.Module):
         def __init__(self, in_channels: int = 10, hidden_channels: int = 64, out_channels: int = 1):
@@ -64,8 +63,8 @@ else:
             x2 = x2 + x_res2
             x2 = self.dropout(x2)
             
-            x3 = self.fc3(x2)
-            return torch.sigmoid(x3).squeeze()
+            logits = self.fc3(x2)
+            return logits.squeeze()
 
 
 class GATTrainer:
@@ -74,27 +73,32 @@ class GATTrainer:
         self.device = device
         self.model = FraudGATModel().to(self.device)
         self.optimizer = None
-        self.criterion = nn.BCELoss()
 
-    def train(self, data, epochs: int = 200, lr: float = 0.005) -> dict:
+    def train(self, data, labels: torch.Tensor, epochs: int = 200, lr: float = 0.005) -> dict:
         self.model.train()
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr, weight_decay=1e-4)
         
         x = data.x.to(self.device)
         edge_index = data.edge_index.to(self.device) if hasattr(data, 'edge_index') else None
-        y = torch.randint(0, 2, (x.size(0),), dtype=torch.float).to(self.device)
+        y = labels.to(self.device)
         
+        # Calculate class imbalance weighting
+        num_pos = (y == 1).sum().item()
+        num_neg = (y == 0).sum().item()
+        pos_weight = torch.tensor([num_neg / max(1, num_pos)], device=self.device)
+        
+        criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
         history = {'loss': []}
         
         for epoch in range(epochs):
             self.optimizer.zero_grad()
             
             if edge_index is not None:
-                out = self.model(x, edge_index)
+                logits = self.model(x, edge_index)
             else:
-                out = self.model(x, None)
+                logits = self.model(x, None)
                 
-            loss = self.criterion(out, y)
+            loss = criterion(logits, y)
             loss.backward()
             self.optimizer.step()
             
@@ -105,23 +109,32 @@ class GATTrainer:
                 
         return history
 
-    def evaluate(self, data) -> dict:
+    def evaluate(self, data, labels: torch.Tensor) -> dict:
+        from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
         self.model.eval()
         with torch.no_grad():
             x = data.x.to(self.device)
             edge_index = data.edge_index.to(self.device) if hasattr(data, 'edge_index') else None
+            y_true = labels.numpy()
             
             if edge_index is not None:
-                preds = self.model(x, edge_index)
+                logits = self.model(x, edge_index)
             else:
-                preds = self.model(x, None)
+                logits = self.model(x, None)
                 
-            precision = 0.85
-            recall = 0.80
-            f1 = 0.82
-            auc = 0.88
+            probs = torch.sigmoid(logits).cpu().numpy()
+            preds = (probs > 0.5).astype(int)
+            
+            precision = float(precision_score(y_true, preds, zero_division=0))
+            recall = float(recall_score(y_true, preds, zero_division=0))
+            f1 = float(f1_score(y_true, preds, zero_division=0))
+            try:
+                auc = float(roc_auc_score(y_true, probs))
+            except Exception:
+                auc = 0.5
             
         return {'precision': precision, 'recall': recall, 'f1': f1, 'auc_roc': auc}
+
 
     def predict_node_risk(self, data, account_id: str, node_mapping: dict) -> float:
         self.model.eval()
@@ -130,13 +143,14 @@ class GATTrainer:
             edge_index = data.edge_index.to(self.device) if hasattr(data, 'edge_index') else None
             
             if edge_index is not None:
-                preds = self.model(x, edge_index)
+                logits = self.model(x, edge_index)
             else:
-                preds = self.model(x, None)
+                logits = self.model(x, None)
                 
+            probs = torch.sigmoid(logits)
             node_idx = node_mapping.get(account_id)
-            if node_idx is not None and node_idx < preds.size(0):
-                return preds[node_idx].item()
+            if node_idx is not None and node_idx < probs.size(0):
+                return probs[node_idx].item()
             return 0.0
 
     def save_model(self, path: str):
@@ -151,19 +165,74 @@ class GATTrainer:
 
 
 if __name__ == '__main__':
-    logger.info("Running dummy GAT Training...")
-    x = torch.randn(100, 10)
-    edge_index = torch.randint(0, 100, (2, 300))
-    if HAS_PYG:
-        data = Data(x=x, edge_index=edge_index)
+    from sklearn.preprocessing import StandardScaler
+    from models.graph.transaction_graph import TransactionGraphBuilder, load_paysim_as_graph_df
+    
+    _BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+    PAYSIM_CSV = os.path.join(_BASE, 'datasets', 'PS_20174392719_1491204439457_log.csv')
+    
+    if os.path.exists(PAYSIM_CSV):
+        logger.info(f"Loading PaySim Graph Data from {PAYSIM_CSV}...")
+        df = load_paysim_as_graph_df(PAYSIM_CSV, nrows=50000)
     else:
-        class DummyData:
+        logger.warning("PaySim dataset not found. Generating synthetic graph data...")
+        n = 500
+        df = pd.DataFrame({
+            'sender_id': [f'C{i:04d}' for i in range(n)],
+            'receiver_id': [f'M{i % 50:04d}' for i in range(n)],
+            'amount': [round(1000 * (i % 10 + 1), 2) for i in range(n)],
+            'timestamp': pd.date_range('2023-01-01', periods=n, freq='1h'),
+            'is_fraud': [1 if i % 15 == 0 else 0 for i in range(n)]
+        })
+
+    builder = TransactionGraphBuilder()
+    G = builder.build_from_dataframe(df)
+    node_features_df = builder.compute_node_features(G)
+    
+    # Compute true node labels: 1 if node was involved in a fraud transaction
+    fraud_senders = set(df[df['is_fraud'] == 1]['sender_id'])
+    fraud_receivers = set(df[df['is_fraud'] == 1]['receiver_id'])
+    fraud_nodes = fraud_senders.union(fraud_receivers)
+    
+    node_labels = torch.tensor(
+        [1.0 if node in fraud_nodes else 0.0 for node in node_features_df.index],
+        dtype=torch.float
+    )
+    logger.info(f"Total Graph Nodes: {len(node_labels)} | Fraud Nodes: {int(node_labels.sum())}")
+
+    # Scale node features to prevent exploding gradients
+    scaler = StandardScaler()
+    scaled_features = scaler.fit_transform(node_features_df.values)
+    x_tensor = torch.tensor(scaled_features, dtype=torch.float)
+
+    # Prepare PyG/Tensor graph representation
+    edge_index = []
+    node_mapping = {node: i for i, node in enumerate(node_features_df.index)}
+    for u, v in G.edges():
+        if u in node_mapping and v in node_mapping:
+            edge_index.append([node_mapping[u], node_mapping[v]])
+            
+    if edge_index:
+        edge_tensor = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
+    else:
+        edge_tensor = torch.zeros((2, 0), dtype=torch.long)
+        
+    if HAS_PYG:
+        data = Data(x=x_tensor, edge_index=edge_tensor)
+    else:
+        class GraphData:
             pass
-        data = DummyData()
-        data.x = x
-        data.edge_index = edge_index
+        data = GraphData()
+        data.x = x_tensor
+        data.edge_index = edge_tensor
+
 
     trainer = GATTrainer()
-    history = trainer.train(data, epochs=200)
-    metrics = trainer.evaluate(data)
-    logger.info(f"Evaluation Metrics: {metrics}")
+    logger.info("Training GAT Model on PaySim Graph...")
+    history = trainer.train(data, node_labels, epochs=150, lr=0.005)
+    metrics = trainer.evaluate(data, node_labels)
+    logger.info(f"Evaluation Metrics on PaySim Graph: {metrics}")
+
+    save_path = os.path.join(_BASE, 'models', 'saved', 'gat_model.pt')
+    trainer.save_model(save_path)
+

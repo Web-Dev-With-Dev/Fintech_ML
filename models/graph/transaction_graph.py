@@ -158,6 +158,7 @@ class TransactionGraphBuilder:
         
         return Data(x=x, edge_index=edge_index)
 
+
     def visualize_fraud_ring(self, subgraph: nx.DiGraph, output_path: str):
         plt.figure(figsize=(10, 8))
         pos = nx.spring_layout(subgraph)
@@ -169,3 +170,70 @@ class TransactionGraphBuilder:
         plt.savefig(output_path)
         plt.close()
         logger.info(f"Fraud ring visualization saved to {output_path}")
+
+
+# ─── Dataset paths ────────────────────────────────────────────────────────────
+import os as _os
+_BASE       = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..')
+DATASET_DIR = _os.path.join(_BASE, 'datasets')
+PAYSIM_CSV  = _os.path.join(DATASET_DIR, 'PS_20174392719_1491204439457_log.csv')
+
+
+def load_paysim_as_graph_df(path: str, nrows: int = 50_000) -> pd.DataFrame:
+    """
+    Load PaySim CSV and rename columns to match TransactionGraphBuilder schema.
+    PaySim columns: step, type, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
+                    nameDest, oldbalanceDest, newbalanceDest, isFraud, isFlaggedFraud
+    → Mapped to: sender_id, receiver_id, amount, timestamp, is_fraud
+    """
+    raw = pd.read_csv(path, nrows=nrows)
+    logger.info(f"PaySim loaded: {len(raw)} rows | Fraud: {raw['isFraud'].sum()} ({raw['isFraud'].mean():.2%})")
+
+    df = pd.DataFrame({
+        'sender_id':   raw['nameOrig'],
+        'receiver_id': raw['nameDest'],
+        'amount':      raw['amount'],
+        'timestamp':   pd.to_datetime('2023-01-01') + pd.to_timedelta(raw['step'], unit='h'),
+        'is_fraud':    raw['isFraud']
+    })
+    return df
+
+
+if __name__ == '__main__':
+    builder = TransactionGraphBuilder()
+
+    # ── Load real PaySim dataset ──────────────────────────────────────────────
+    if _os.path.exists(PAYSIM_CSV):
+        logger.info(f"Loading PaySim from: {PAYSIM_CSV}")
+        df = load_paysim_as_graph_df(PAYSIM_CSV, nrows=50_000)
+    else:
+        logger.warning("PaySim CSV not found. Using mock data.")
+        import numpy as np
+        n = 100
+        df = pd.DataFrame({
+            'sender_id':   [f'C{i:04d}' for i in range(n)],
+            'receiver_id': [f'M{i % 20:04d}' for i in range(n)],
+            'amount':      [round(1000 * (i % 10 + 1), 2) for i in range(n)],
+            'timestamp':   pd.date_range('2023-01-01', periods=n, freq='1h'),
+            'is_fraud':    [1 if i % 10 == 0 else 0 for i in range(n)]
+        })
+
+    # ── Build graph ───────────────────────────────────────────────────────────
+    G = builder.build_from_dataframe(df)
+    logger.info(f"Graph: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
+
+    # ── Compute node features ─────────────────────────────────────────────────
+    node_features = builder.compute_node_features(G)
+    logger.info(f"Node features shape: {node_features.shape}")
+
+    # ── Detect fraud patterns ─────────────────────────────────────────────────
+    hubs = builder.detect_star_topology(G, threshold_victims=5)
+    logger.info(f"Star topology hubs (potential scammers): {len(hubs)} found")
+    if hubs:
+        logger.info(f"  Top hubs: {hubs[:5]}")
+
+    drained = builder.detect_rapid_drain(G, df, window_seconds=3600)
+    logger.info(f"Rapid drain accounts detected: {len(drained)}")
+
+    logger.info("Transaction graph pipeline complete.")
+

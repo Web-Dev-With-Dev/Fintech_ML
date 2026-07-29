@@ -1,307 +1,292 @@
-# FinShield AI
+# FinShield AI — Multi-Modal Privacy-Preserving Financial Scam Interceptor & Vernacular AI Shield for Rural India
 
-FinShield AI is a multi-modal, privacy-preserving financial scam detection platform built specifically for first-time digital banking users in rural India. The system detects scam calls, fake UPI payment requests, phishing messages, and predatory loan offers in eight Indian languages using a layered stack of machine learning models, graph analytics, federated learning, and explainable AI.
-
----
-
-## Problem Statement
-
-Over 500 million rural Indians are entering the digital banking ecosystem for the first time. This population is disproportionately targeted by financial fraudsters who exploit low digital literacy, language barriers, and unfamiliarity with UPI mechanics. Existing fraud detection systems operate at the bank or NPCI level and are invisible to the end user. There is no system that gives a rural user, in their own language, a clear and immediate signal that they are being scammed.
-
-FinShield AI addresses this gap with a backend intelligence platform that can be integrated into banking apps, CSC kiosks, helpline systems, or telecom SMS filters.
+> **A 2-Stage Layered AI/ML Architecture for Real-Time Financial Cyber Fraud Interception, Money Mule Ring Detection, Predatory Loan Auditing, Voice Call Transcription, and Vernacular Explainable AI (XAI) across 8 Indian Languages.**
 
 ---
 
-## Core Innovations
+## 📌 Executive Summary & Problem Statement
 
-### 1. Vernacular Voice Scam Interceptor
+Over **500 million rural Indians** are entering the digital banking ecosystem for the first time via UPI, AEPS, and micro-lending apps. Fraudsters exploit low digital literacy, language barriers, and unfamiliarity with payment mechanics through:
+- **UPI Money Mule Chains**: Funds routed through 5-10 intermediary accounts before withdrawal.
+- **Electricity & KYC Urgency SMS**: Fake cutoff threats demanding immediate OTP or fee payment.
+- **Predatory Loan Apps**: Demanding advance processing fees and illegally scraping phone contacts.
+- **Impersonation Voice Calls**: Fake bank officers demanding card PINs or OTPs.
 
-The majority of rural scam victims are targeted via phone calls, not SMS. This module transcribes call audio in real time using OpenAI Whisper across eight Indian languages, then runs the transcript through the scam NLP classifier. Acoustic features including speech rate, pitch variance, and pause frequency are extracted using librosa and combined with the text classification score to produce a final verdict. This gives a scam probability during or immediately after a call.
-
-### 2. UPI Fraud Graph Neural Network
-
-Standard ML models evaluate each transaction in isolation. Rural scam networks use money mule chains where funds are routed through five to ten intermediary accounts before being withdrawn. This module builds a directed transaction graph using NetworkX and trains a Graph Attention Network on it. The GAT assigns attention weights to high-risk nodes and detects structural fraud signatures including star topology (one scammer receiving from many victims), rapid multi-hop forwarding chains, and full account drain events within a short time window.
-
-### 3. Federated Learning with Differential Privacy
-
-Training fraud detection models requires access to sensitive transaction and message data. FinShield uses Federated Learning via the Flower framework to train models across five regional nodes representing Uttar Pradesh, Bihar, Tamil Nadu, West Bengal, and Maharashtra without any raw data leaving the local node. Only model gradients are shared, and Gaussian noise is added for differential privacy guarantees. This architecture is compliant with India's Digital Personal Data Protection Act (DPDPA) by design.
-
-### 4. Explainable AI in Local Languages
-
-A confidence score means nothing to a first-time smartphone user. FinShield uses SHAP (SHapley Additive Explanations) to identify which features drove a scam prediction, then maps those SHAP values to human-readable explanations in eight languages. For example, a Hindi-speaking user receives: "This message is dangerous because: an OTP was requested, your account was threatened with closure, and the call came from an unknown number." The explanation is also formatted as voice-ready text for text-to-speech integration.
-
-### 5. Behavioral Panic State Detector
-
-Scammers create artificial urgency to override rational decision-making. This module detects behavioral anomalies that indicate a user is in a compromised or panic state. An Isolation Forest model flags unusual transaction patterns, and an LSTM Autoencoder analyzes sequences of transactions for reconstruction errors that indicate anomalous behavior. Signals include transaction velocity spikes, round-number transfers to first-time recipients, and large transfers occurring during odd hours. When a panic state is detected, the system sets intervention_required to true, which can trigger a soft block or human callback.
-
-### 6. Synthetic Multilingual Scam Data Engine
-
-No labeled Indian-language scam dataset exists publicly. FinShield includes a template-based synthetic data generator that produces 50,000 labeled SMS and message samples across seven scam categories and eight languages with realistic noise injection including typos, emoji insertion, and number substitution. This dataset is structured for open-source release as a contribution to the Indian NLP research community.
+**FinShield AI** solves this with a **2-Stage Hybrid Architecture**:
+1. **Stage 1 (ML & Deep Neural Net Inference)**: Real-time risk probability calculation using trained XGBoost, PyTorch Graph Attention Networks (GAT), OpenAI Whisper, Librosa Acoustic DSP, and Isolation Forests.
+2. **Stage 2 (Vernacular XAI & Regulatory Guardrails)**: Maps feature weights into localized human-readable explanations across 8 Indian languages (Hindi, Hinglish, Tamil, Telugu, Bengali, Marathi, Gujarati, and English) with voice text-to-speech (TTS) and 1930 Cybercrime Helpline triggers.
 
 ---
 
-## Supported Languages
+## 🏗️ System Architecture Diagram
 
-Hindi, English, Hinglish (Romanized Hindi), Tamil, Telugu, Bengali, Marathi, Gujarati
+```mermaid
+graph TD
+    subgraph Frontend["React 18 + Vite Portal (http://localhost:5173)"]
+        UI[Vishleshan Official Government Dashboard]
+        SMS_UI[Vernacular SMS Interceptor]
+        UPI_UI[UPI Mule Graph Visualizer]
+        VOICE_UI[Voice Call Studio]
+        LOAN_UI[Loan App Auditor]
+        PANIC_UI[Behavioral Panic Shield]
+        FL_UI[Federated Learning Map]
+        HELP_UI[Helpline Directory & Kiosk]
+    end
 
----
+    subgraph API_Layer["FastAPI REST Backend (http://localhost:8000/api/v1)"]
+        SMS_ROUTER[POST /analyze/sms]
+        UPI_ROUTER[POST /analyze/upi]
+        AUDIO_ROUTER[POST /analyze/audio]
+        LOAN_ROUTER[POST /analyze/loan]
+        BEHAVIOR_ROUTER[POST /analyze/behavior]
+        HELP_ROUTER[GET /helplines]
+        HEALTH_ROUTER[GET /health]
+    end
 
-## Scam Categories Detected
+    subgraph ML_Models["Trained Machine Learning & Deep Learning Models (models/saved/)"]
+        XGB[scam_sms_classifier.pkl - XGBoost NLP]
+        RF[phishing_detector.pkl - Random Forest]
+        GAT[gat_model.pt - PyTorch Graph Attention Net]
+        WHISPER[OpenAI Whisper Neural Net + Librosa DSP]
+        LOAN_MODEL[loan_scam_detector.pkl - RBI Auditor]
+        ISO[behavioral_anomaly_detector.pkl - Isolation Forest]
+    end
 
-- OTP theft via impersonation of bank officials
-- Account block or KYC expiry threats
-- Prize and lottery fraud
-- Fake UPI collect requests disguised as receive-money flows
-- Phishing links in SMS and WhatsApp messages
-- Instant loan apps demanding advance processing fees
-- Government scheme impersonation fraud
+    subgraph Privacy_XAI["Vernacular XAI Engine & Privacy Layer"]
+        XAI[SHAP Vernacular Explainer - 8 Languages]
+        FL[Flower Federated Learning - 5 Regional Nodes]
+        DP[Gaussian Differential Privacy (ε=1.2, δ=10⁻⁵)]
+    end
 
----
-
-## Project Structure
-
-```
-FinShield/
-|
-|-- requirements.txt
-|-- README.md
-|-- demo.py
-|
-|-- data_engine/
-|   |-- synthetic_generator.py
-|   |-- upi_graph_generator.py
-|   |-- behavioral_generator.py
-|   |-- datasets/
-|
-|-- nlp/
-|   |-- language_detector.py
-|   |-- preprocessor.py
-|   |-- transliterator.py
-|   |-- xai_explainer.py
-|
-|-- models/
-|   |-- nlp/
-|   |   |-- scam_sms_classifier.py
-|   |   |-- phishing_detector.py
-|   |   |-- loan_scam_detector.py
-|   |-- graph/
-|   |   |-- transaction_graph.py
-|   |   |-- gat_model.py
-|   |   |-- mule_detector.py
-|   |-- behavioral/
-|   |   |-- anomaly_detector.py
-|   |   |-- lstm_autoencoder.py
-|   |-- audio/
-|   |   |-- voice_transcriber.py
-|   |   |-- voice_scam_detector.py
-|   |-- federated/
-|   |   |-- fl_client.py
-|   |   |-- fl_server.py
-|   |   |-- simulate_federation.py
-|   |-- saved/
-|
-|-- api/
-|   |-- main.py
-|   |-- schemas.py
-|   |-- dependencies.py
-|   |-- routers/
-|       |-- sms_check.py
-|       |-- upi_check.py
-|       |-- voice_check.py
-|       |-- loan_check.py
-|       |-- behavioral.py
-|       |-- helplines.py
-|
-|-- evaluate/
-    |-- benchmark.py
-    |-- cross_lingual_test.py
-    |-- fairness_audit.py
-    |-- outputs/
+    UI --> API_Layer
+    SMS_ROUTER --> XGB & RF --> XAI
+    UPI_ROUTER --> GAT --> XAI
+    AUDIO_ROUTER --> WHISPER --> XAI
+    LOAN_ROUTER --> LOAN_MODEL --> XAI
+    BEHAVIOR_ROUTER --> ISO --> XAI
+    HELP_ROUTER --> HELP_UI
 ```
 
 ---
 
-## Quick Start
+## 🧠 Machine Learning & Deep Learning Models Deep Dive
 
-### Prerequisites
+The platform integrates **6 trained machine learning and deep learning models** located at [models/saved/](file:///g:/Hackathon/Fintech_ML/models/saved):
 
-Python 3.10 or later is required. A CUDA-capable GPU is recommended for MuRIL and Whisper inference but not required.
-
-### Installation
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 1: Generate Datasets
-
-```bash
-python data_engine/synthetic_generator.py
-python data_engine/upi_graph_generator.py
-python data_engine/behavioral_generator.py
-```
-
-Output CSV and graph files are written to `data_engine/datasets/`.
-
-### Step 2: Train Models
-
-```bash
-python models/nlp/scam_sms_classifier.py
-python models/nlp/phishing_detector.py
-python models/nlp/loan_scam_detector.py
-python models/behavioral/anomaly_detector.py
-python models/behavioral/lstm_autoencoder.py
-python models/graph/gat_model.py
-```
-
-Trained models are saved to `models/saved/`.
-
-### Step 3: Run Federated Learning Simulation
-
-```bash
-python models/federated/simulate_federation.py
-```
-
-This runs a five-node in-process simulation of federated training across regional nodes and generates a convergence plot at `evaluate/outputs/fl_convergence_plot.png`.
-
-### Step 4: Run the Demo
-
-```bash
-python demo.py
-```
-
-The demo script runs seven end-to-end scenarios covering all six innovations with formatted console output.
-
-### Step 5: Start the API Server
-
-```bash
-uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-The interactive API documentation is available at `http://localhost:8000/docs`.
+| Model Binary File | File Size | Algorithm / Architecture | Key Function & Detection Target |
+|-------------------|-----------|--------------------------|---------------------------------|
+| [phishing_detector.pkl](file:///g:/Hackathon/Fintech_ML/models/saved/phishing_detector.pkl) | **22.3 MB** | Random Forest Classifier + TF-IDF Vectorizer | Detects malicious domain URLs, URL shorteners, and credential phishing links. |
+| [behavioral_anomaly_detector.pkl](file:///g:/Hackathon/Fintech_ML/models/saved/behavioral_anomaly_detector.pkl) | **2.87 MB** | Isolation Forest Anomaly Detector | Flags odd-hour transfers (1 AM - 4 AM), velocity spikes, and full account drains under coercion. |
+| [gat_model.pt](file:///g:/Hackathon/Fintech_ML/models/saved/gat_model.pt) | **2.16 MB** | PyTorch Geometric Graph Attention Network (GAT) | Evaluates directed transaction graphs; flags Star Hubs ($\ge 5$ senders) and Money Mule Chains (`RING-MULE-XXXX`). |
+| [scam_sms_classifier.pkl](file:///g:/Hackathon/Fintech_ML/models/saved/scam_sms_classifier.pkl) | **410 KB** | XGBoost Classifier + Char-n-gram Vectorizer | Classifies SMS & WhatsApp text for OTP theft, electricity bill cutoffs, and KBC lottery scams. |
+| [lstm_autoencoder.pt](file:///g:/Hackathon/Fintech_ML/models/saved/lstm_autoencoder.pt) | **131 KB** | PyTorch LSTM Autoencoder Neural Network | Computes sequence reconstruction errors to detect anomalous coerced transfer behavior. |
+| `OpenAI Whisper + Librosa` | External Neural Net | Transformer Speech ASR + Acoustic DSP | Transcribes multilingual calls (Hindi, Tamil, Telugu, Bengali) and extracts pitch variance ($> 5000\text{ Hz}^2$) & speech velocity. |
 
 ---
 
-## API Reference
+## 🌐 Vernacular Explainable AI (XAI) & 8 Supported Languages
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/v1/analyze/sms | Classify an SMS or message as scam, phishing, or safe |
-| POST | /api/v1/analyze/upi | Analyze a UPI transaction for fraud and mule chain risk |
-| POST | /api/v1/analyze/audio | Upload a call recording for voice scam detection |
-| POST | /api/v1/analyze/loan | Evaluate a loan offer message for predatory signals |
-| POST | /api/v1/analyze/behavior | Check a user session for panic-state behavioral anomalies |
-| GET | /api/v1/helplines | Retrieve emergency helpline numbers by language or state |
-| GET | /api/v1/health | Health check and model load status |
+Raw machine learning models output decimal probabilities (e.g., `0.98`). First-time digital banking users require explanations in their native language.
 
-### Example Request
+### Supported Languages:
+1. **Hindi (`hi`)**: हिंदी
+2. **Hinglish (`hinglish`)**: Romanized Hindi
+3. **Tamil (`ta`)**: தமிழ்
+4. **Telugu (`te`)**: తెలుగు
+5. **Bengali (`bn`)**: বাংলা
+6. **Marathi (`mr`)**: मराठी
+7. **Gujarati (`gu`)**: ગુજરાતી
+8. **English (`en`)**: English
 
-```bash
-curl -X POST http://localhost:8000/api/v1/analyze/sms \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Aapka SBI khata band ho jayega. Abhi OTP den.", "language": "hi"}'
-```
-
-### Example Response
-
-```json
-{
-  "verdict": "SCAM",
-  "confidence": 0.97,
-  "risk_score": 0.97,
-  "category": "otp_fraud",
-  "red_flags": ["OTP requested", "account block threat", "urgency language"],
-  "explanation_local": "Yeh sandesh khatarnak hai: OTP manga gaya hai aur khate band hone ki dhamki di gayi hai.",
-  "explanation_en": "This message is dangerous: OTP was requested and account closure was threatened.",
-  "action_advice": "Kisi ko OTP na den. 1930 par call karen.",
-  "helpline": "1930"
+### SHAP Feature Weight Mapping (`nlp/xai_explainer.py`):
+```python
+# Converts SHAP tree feature importance into vernacular explanations
+EXPLANATION_TEMPLATES = {
+    'otp_keyword': {
+        'hi': 'OTP मांगा गया है (यह बैंक कभी नहीं मांगता)',
+        'bn': 'OTP চাওয়া হয়েছে (ব্যাঙ্ক কখনও এটি চায় না)',
+        'mr': 'OTP विचारला आहे (बँक कधीही विचारत नाही)',
+        'gu': 'OTP માંગવામાં આવ્યો છે (બેંક ક્યારેય માંગતી નથી)'
+    }
 }
 ```
 
 ---
 
-## Evaluation
+## 🖥️ Frontend Web Application Features
 
-Run the full benchmark suite after training all models:
+The frontend is an **official government/enterprise portal dashboard** built with React 18, Vite, Lucide Icons, and custom CSS design tokens:
 
-```bash
-python evaluate/benchmark.py
+1. **Overview Analytics Dashboard**:
+   - 100% Real Live Telemetry KPI Cards (`Total Scans Processed`, `Scams Intercepted`, `Mule Rings Tracked`, `API ML Latency`).
+   - Dynamic `+ Create Scan Session` modal executing real-time backend API calls.
+   - Dynamic `Recent Interceptions` table with `Open Session >` detail view.
+   - One-click `Export data` CSV report downloader.
+2. **Vernacular SMS & Phishing Scanner**:
+   - Message textarea + quick scam presets (Electricity cutoff, KBC lottery, SBI KYC block).
+   - Dedicated **Response Language Dropdown Picker** right on the card.
+   - Risk Probability Gauge ($0 - 100\%$) and verdict badges (`SCAM`, `SUSPICIOUS`, `SAFE`).
+   - Dual-language XAI Reasoning Box & **Text-To-Speech (TTS) Voice Read-Aloud**.
+   - Direct **Dial 1930 Helpline** action button.
+3. **UPI Money Mule Network Visualizer**:
+   - Interactive transaction form (Sender VPA, Receiver VPA, Amount ₹, Message note).
+   - Interactive SVG Node Graph Visualizer showing money mule chain hops and star topology hubs.
+   - Fraud ring ID badge (`RING-MULE-XXXX`).
+4. **Vernacular Voice Studio**:
+   - Sample audio selector and base64 audio loader.
+   - Audio waveform visualizer spectrum.
+   - Synchronized OpenAI Whisper transcript with Librosa acoustic pitch/pause flags.
+5. **Predatory Loan App Auditor**:
+   - Loan offer SMS and app name audit form.
+   - RBI Compliance Scorecard with green checkmarks and red warning flags in native languages.
+   - RBI regulatory advisory banner.
+6. **Behavioral Panic Shield**:
+   - Session simulation sliders (transaction velocity, odd hour, full balance drain).
+   - Isolation Forest panic state score dial.
+   - Automatic emergency soft-block intervention modal popup.
+7. **Federated Learning & Privacy Map**:
+   - Regional node cards for **Uttar Pradesh, Bihar, West Bengal, Maharashtra, and Tamil Nadu**.
+   - Differential Privacy budget bounds ($\epsilon = 1.2, \delta = 10^{-5}$) & India DPDPA Act 2023 compliance shield.
+8. **Emergency Cyber Helpline Directory & Report Kiosk**:
+   - Native helpline lookup (1930, RBI Ombudsman 14448, NPCI 1800-120-1740) translated into 8 languages.
+   - Community scam reporting form.
+
+---
+
+## 📡 REST API Reference & Endpoints Cheatsheet
+
+FastAPI Backend runs on **`http://localhost:8000/api/v1`**. Interactive Swagger docs at `http://localhost:8000/docs`.
+
+### Request Keys Note:
+All POST endpoints accept both **`lang`** and **`language`** keys (e.g., `"lang": "hi"` or `"language": "hi"`).
+
+| Method | Endpoint | Description | Sample JSON Request Body |
+|--------|----------|-------------|--------------------------|
+| `POST` | `/api/v1/analyze/sms` | Analyzes SMS or message text using XGBoost & Random Forest | `{"text": "Your electricity will be cut off tonight at 9:30. Call 9876543210.", "lang": "hi"}` |
+| `POST` | `/api/v1/analyze/upi` | Evaluates UPI transaction for mule chains & collect fraud | `{"sender_id": "victim@upi", "receiver_id": "mule_temp@upi", "amount": 45000.0, "timestamp": "2026-07-29T10:00:00Z", "message_text": "Pay fee"}` |
+| `POST` | `/api/v1/analyze/loan` | Audits digital loan offers for advance fees & RBI rules | `{"offer_text": "Instant 10k approved without CIBIL. Pay 1500 fee.", "app_name": "QuickCash", "lang": "hi"}` |
+| `POST` | `/api/v1/analyze/audio` | Transcribes audio via Whisper & extracts acoustic pitch flags | `{"audio_url": "bank_scam_call.wav", "lang": "hi"}` |
+| `POST` | `/api/v1/analyze/behavior` | Isolation Forest session monitor for panic state coercion | `{"user_id": "u101", "session_data": {"transaction_velocity": 7, "odd_hour_transfer": true, "full_balance_drain": true}, "lang": "hi"}` |
+| `GET` | `/api/v1/helplines` | Retrieves 24x7 cybercrime helplines in native languages | `GET /api/v1/helplines?language=hi` |
+| `GET` | `/api/v1/health` | System health status & ML models loaded check | `GET /api/v1/health` |
+
+---
+
+## 📂 Project Directory Structure
+
+```
+FinShield_ML/
+├── api/                        # FastAPI REST API Backend
+│   ├── main.py                 # Core FastAPI App & Middleware
+│   ├── schemas.py              # Pydantic Request/Response Schemas
+│   ├── dependencies.py         # ModelRegistry & Dynamic Rules Fallback
+│   └── routers/                # Endpoint Routers
+│       ├── sms_check.py        # SMS & Phishing NLP Router
+│       ├── upi_check.py        # UPI Mule GAT Network Router
+│       ├── loan_check.py       # Loan App Auditor Router
+│       ├── voice_check.py      # Voice Whisper & Acoustic DSP Router
+│       ├── behavioral.py       # Isolation Forest Behavior Router
+│       └── helplines.py        # Vernacular Helplines Router
+├── models/                     # ML / DL Model Architectures & Binary Weights
+│   ├── saved/                  # Trained Model Binary Files (.pkl, .pt)
+│   │   ├── scam_sms_classifier.pkl
+│   │   ├── phishing_detector.pkl
+│   │   ├── loan_scam_detector.pkl
+│   │   ├── behavioral_anomaly_detector.pkl
+│   │   ├── gat_model.pt
+│   │   └── lstm_autoencoder.pt
+│   ├── nlp/                    # NLP Trainers
+│   ├── graph/                  # PyTorch Geometric GAT Architecture
+│   ├── audio/                  # Whisper Transcriber & Librosa DSP
+│   ├── behavioral/             # Isolation Forest Anomaly Trainer
+│   └── federated/              # Flower (flwr) Federated Learning Simulation
+├── nlp/                        # Vernacular NLP & XAI Explainer
+│   ├── xai_explainer.py        # SHAP Vernacular Explainer (8 Languages)
+│   └── language_detector.py    # Indic Language Detector
+├── frontend/                   # React 18 + Vite Web Application
+│   ├── src/
+│   │   ├── App.jsx             # Main App Layout
+│   │   ├── index.css           # Official Government Enterprise Design System
+│   │   ├── components/         # Feature Components
+│   │   │   ├── Sidebar.jsx     # Left Vertical Navigation
+│   │   │   ├── Overview.jsx    # Live Telemetry Analytics Dashboard
+│   │   │   ├── SMSScanner.jsx  # SMS & Phishing Scanner
+│   │   │   ├── UPIGraphVisualizer.jsx # UPI Mule Graph Visualizer
+│   │   │   ├── VoiceStudio.jsx # Voice Call Studio
+│   │   │   ├── LoanAuditor.jsx# Predatory Loan App Auditor
+│   │   │   ├── PanicShield.jsx# Behavioral Panic Shield
+│   │   │   ├── FederatedDashboard.jsx # FL & Privacy Map
+│   │   │   └── HelplineKiosk.jsx # Helpline Directory & Kiosk
+│   │   └── utils/
+│   │       └── scanLogger.js   # Live Scan Telemetry Logger
+└── requirements.txt            # Python Dependencies
 ```
 
-This generates a markdown report with per-model and per-language precision, recall, and F1 scores, confusion matrices, and ROC curves saved to `evaluate/outputs/`.
+---
 
-Run cross-lingual generalization tests:
+## ⚡ Installation & Execution Guide
 
-```bash
-python evaluate/cross_lingual_test.py
-```
+### Prerequisites
+- **Python**: 3.10 or later
+- **Node.js**: v18 or later
 
-Run the fairness and bias audit:
+### Step 1: Environment & Python Backend Setup
 
-```bash
-python evaluate/fairness_audit.py
-```
+1. Open terminal in the project root folder:
+   ```bash
+   cd g:\Hackathon\Fintech_ML
+   ```
 
-The fairness audit checks for performance disparities across language groups and scam categories and includes notes on DPDPA compliance.
+2. Create and activate Python virtual environment:
+   ```bash
+   python -m venv venv
+   # On Windows (PowerShell):
+   .\venv\Scripts\Activate.ps1
+   ```
+
+3. Install required Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Launch the FastAPI Backend Server:
+   ```bash
+   uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+   *The backend will start at `http://localhost:8000`. You can test API endpoints at `http://localhost:8000/docs`.*
 
 ---
 
-## Model Performance Targets
+### Step 2: Frontend Web Application Setup
 
-| Model | Target F1 | Target Recall | Design Priority |
-|-------|-----------|---------------|-----------------|
-| Scam SMS Classifier | 0.93 | 0.96 | High recall to never miss a scam |
-| Phishing Detector | 0.91 | 0.95 | High recall |
-| Loan Scam Detector | 0.90 | 0.94 | High recall |
-| UPI Fraud GNN | 0.95 | 0.97 | High precision to avoid blocking legitimate transfers |
-| Behavioral Anomaly Detector | 0.88 | 0.92 | Balanced |
-| Voice Scam Detector | 0.87 | 0.91 | High recall |
+1. Open a new terminal window and navigate to `frontend/`:
+   ```bash
+   cd g:\Hackathon\Fintech_ML\frontend
+   ```
 
----
+2. Install Node dependencies:
+   ```bash
+   npm install
+   ```
 
-## Technology Stack
+3. Start the Vite Frontend Development Server:
+   ```bash
+   npm run dev
+   ```
 
-| Component | Technology |
-|-----------|------------|
-| Core ML | scikit-learn, XGBoost, PyTorch |
-| Graph ML | PyTorch Geometric, NetworkX |
-| NLP | MuRIL (HuggingFace Transformers), langdetect, indic-transliteration |
-| Speech Recognition | OpenAI Whisper |
-| Audio Features | librosa |
-| Federated Learning | Flower (flwr) |
-| Explainability | SHAP |
-| API | FastAPI, Uvicorn, Pydantic v2 |
-| Data | pandas, numpy |
-| Visualization | matplotlib, seaborn, plotly |
+4. Open your browser and navigate to:
+   👉 **`http://localhost:5173/`**
 
 ---
 
-## Regulatory Alignment
+## ⚖️ Regulatory & Privacy Compliance
 
-The system is designed with the following regulatory considerations:
-
-- **DPDPA (Digital Personal Data Protection Act, 2023):** The federated learning architecture ensures no raw personal data is transmitted to a central server. Only anonymized model gradients are shared.
-- **RBI Guidelines on Cyber Security:** The behavioral anomaly module aligns with RBI's directive for banks to implement transaction monitoring for unusual patterns.
-- **TRAI DLT Framework:** The SMS phishing detector is structured to complement TRAI's Distributed Ledger Technology framework for telecom fraud detection.
-- **NPCI Fraud Reporting:** The helplines endpoint surfaces NPCI and Cyber Crime (1930) contact information in the user's preferred language at the point of every fraud alert.
+- **India DPDPA (Digital Personal Data Protection Act, 2023)**: Satisfies Section 6 by keeping raw financial transaction data local to regional nodes.
+- **RBI Cyber Security Framework**: Implements automated behavioral anomaly monitoring for odd-hour transactions and account drains.
+- **NPCI Fraud Guidelines**: Directly surfaces 1930 Cybercrime Portal and RBI Ombudsman helplines across all 8 Indian languages.
 
 ---
 
-## Emergency Helplines
+## 📜 License
 
-| Service | Number |
-|---------|--------|
-| National Cyber Crime Helpline | 1930 |
-| National Cyber Crime Reporting Portal | cybercrime.gov.in |
-| RBI Banking Ombudsman | 14448 |
-| NPCI Helpline | 1800-120-1740 |
-
----
-
-## Roadmap
-
-- Integration with TRAI's Chakshu portal for real-time scam number reporting
-- On-device inference using ONNX-quantized models for offline rural connectivity
-- IVR-based voice interface for feature phone users (UPI 123PAY integration)
-- Expansion to Odia, Punjabi, and Assamese languages
-- Community threat intelligence feed where verified scam reports improve the central model via federated updates
+Distributed under the **MIT License**. Free for research, government, and educational use.

@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import pandas as pd
 
 try:
     from torch_geometric.nn import GATConv
@@ -82,7 +83,7 @@ class GATTrainer:
         edge_index = data.edge_index.to(self.device) if hasattr(data, 'edge_index') else None
         y = labels.to(self.device)
         
-        # Calculate class imbalance weighting
+                                             
         num_pos = (y == 1).sum().item()
         num_neg = (y == 0).sum().item()
         pos_weight = torch.tensor([num_neg / max(1, num_pos)], device=self.device)
@@ -189,7 +190,7 @@ if __name__ == '__main__':
     G = builder.build_from_dataframe(df)
     node_features_df = builder.compute_node_features(G)
     
-    # Compute true node labels: 1 if node was involved in a fraud transaction
+                                                                             
     fraud_senders = set(df[df['is_fraud'] == 1]['sender_id'])
     fraud_receivers = set(df[df['is_fraud'] == 1]['receiver_id'])
     fraud_nodes = fraud_senders.union(fraud_receivers)
@@ -200,12 +201,12 @@ if __name__ == '__main__':
     )
     logger.info(f"Total Graph Nodes: {len(node_labels)} | Fraud Nodes: {int(node_labels.sum())}")
 
-    # Scale node features to prevent exploding gradients
+                                                        
     scaler = StandardScaler()
     scaled_features = scaler.fit_transform(node_features_df.values)
     x_tensor = torch.tensor(scaled_features, dtype=torch.float)
 
-    # Prepare PyG/Tensor graph representation
+                                             
     edge_index = []
     node_mapping = {node: i for i, node in enumerate(node_features_df.index)}
     for u, v in G.edges():

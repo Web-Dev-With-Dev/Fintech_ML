@@ -75,17 +75,17 @@ class PhishingDetector:
         """
         logger.info(f"Loading phishing dataset from {dataset_path}...")
 
-        # ── Load real URL dataset ─────────────────────────────────────────────
+                                                                                
         if os.path.exists(dataset_path):
             try:
                 raw = pd.read_csv(dataset_path, encoding='latin-1', on_bad_lines='skip')
                 raw.columns = raw.columns.str.strip()
 
-                # ── Format 1: phishing_site_urls.csv (URL + Label: bad/good) ─
+                                                                               
                 if 'URL' in raw.columns and 'Label' in raw.columns:
                     raw = raw.dropna(subset=['URL', 'Label'])
 
-                    # Sample balanced subset for speed (max 5000 each class)
+                                                                            
                     bad  = raw[raw['Label'] == 'bad'].sample(
                         min(5000, (raw['Label'] == 'bad').sum()), random_state=42)
                     good = raw[raw['Label'] == 'good'].sample(
@@ -104,7 +104,7 @@ class PhishingDetector:
                         f"(sampled from {len(raw)} total)"
                     )
 
-                # ── Format 2: URLhaus csv.txt (no header, # comments) ────────
+                                                                               
                 elif dataset_path.endswith('.txt') or 'urlhaus' in dataset_path.lower():
                     raw2 = pd.read_csv(
                         dataset_path,
@@ -149,7 +149,7 @@ class PhishingDetector:
             labels_raw = ['kyc_fraud', 'prize_lottery', 'safe']
 
 
-        # ── Fit vectorizer & build features ──────────────────────────────────
+                                                                               
         self.vectorizer.fit(texts)
         features_list = []
         for text, lang in zip(texts, langs):
@@ -235,7 +235,7 @@ class PhishingDetector:
 if __name__ == '__main__':
     import os as _os
     _DATASET_DIR  = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', 'datasets')
-    _PHISH_CSV    = _os.path.join(_DATASET_DIR, 'phishing_site_urls.csv')  # 549K rows, URL+Label
+    _PHISH_CSV    = _os.path.join(_DATASET_DIR, 'phishing_site_urls.csv')                        
 
     detector = PhishingDetector()
     detector.train(_PHISH_CSV)

@@ -134,18 +134,18 @@ class ScamSMSClassifier:
 
 
 
-# ─── Dataset paths (relative to project root /datasets/) ─────────────────────
+                                                                               
 DATASET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'datasets')
 
-SMS_SPAM_COLLECTION = os.path.join(DATASET_DIR, 'SMSSpamCollection')   # UCI tab-separated
-SPAM_CSV            = os.path.join(DATASET_DIR, 'spam.csv')             # Kaggle CSV
+SMS_SPAM_COLLECTION = os.path.join(DATASET_DIR, 'SMSSpamCollection')                      
+SPAM_CSV            = os.path.join(DATASET_DIR, 'spam.csv')                         
 
 
 def load_sms_datasets() -> pd.DataFrame:
     """Load and merge UCI SMSSpamCollection + Kaggle spam.csv into a unified DataFrame."""
     frames = []
 
-    # 1. UCI SMSSpamCollection (tab-separated: label\tmessage)
+                                                              
     if os.path.exists(SMS_SPAM_COLLECTION):
         uci = pd.read_csv(
             SMS_SPAM_COLLECTION, sep='\t', header=None,
@@ -158,7 +158,7 @@ def load_sms_datasets() -> pd.DataFrame:
     else:
         logger.warning(f"UCI dataset not found at {SMS_SPAM_COLLECTION}")
 
-    # 2. Kaggle spam.csv (columns: v1=label, v2=text)
+                                                     
     if os.path.exists(SPAM_CSV):
         kaggle = pd.read_csv(SPAM_CSV, encoding='latin-1')[['v1', 'v2']]
         kaggle.columns = ['label_raw', 'text']
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     logger.info("Initializing ScamSMSClassifier pipeline...")
     classifier = ScamSMSClassifier()
 
-    # ── Load real datasets from /datasets/ ──────────────────────────────────
+                                                                              
     df = load_sms_datasets()
 
     X_train, X_test, y_train, y_test, lang_train, lang_test = train_test_split(

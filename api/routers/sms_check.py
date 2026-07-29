@@ -30,7 +30,7 @@ def build_dynamic_explanations(text: str, lang: str, red_flags: list, verdict: s
     local_reasons = []
     en_reasons = []
 
-    # Map detected triggers to XAI templates
+                                            
     trigger_map = [
         ('otp', 'otp_keyword'),
         ('urgent', 'urgent_tone'),
@@ -94,14 +94,14 @@ async def analyze_sms(
     phishing_task = asyncio.create_task(async_predict(registry.get_phishing_detector, text, lang))
     sms_res, phishing_res = await asyncio.gather(sms_task, phishing_task)
 
-    # Aggregate Red Flags first
+                               
     red_flags = list(set(
         sms_res.get("red_flags", []) + 
         phishing_res.get("url_flags", []) + 
         phishing_res.get("text_flags", [])
     ))
 
-    # Derive sms_risk
+                     
     if "risk_score" in sms_res:
         sms_risk = float(sms_res["risk_score"])
     elif sms_res.get("label") == "SCAM" or sms_res.get("rule_triggered"):
@@ -109,7 +109,7 @@ async def analyze_sms(
     else:
         sms_risk = 0.10
 
-    # Derive phish_risk
+                       
     if "risk_score" in phishing_res:
         phish_risk = float(phishing_res["risk_score"])
     elif phishing_res.get("is_phishing"):
@@ -117,7 +117,7 @@ async def analyze_sms(
     else:
         phish_risk = 0.10
 
-    # If critical red flags exist, ensure elevated risk score
+                                                             
     if len(red_flags) >= 2:
         risk_score = max(sms_risk, phish_risk, 0.88)
     elif len(red_flags) == 1:
@@ -129,7 +129,7 @@ async def analyze_sms(
     phish_conf = phishing_res.get("confidence", 0.5)
     confidence = max(sms_conf, phish_conf)
 
-    # Determine Verdict
+                       
     if risk_score >= 0.75:
         verdict = ScamVerdict.SCAM
     elif risk_score >= 0.45:
@@ -137,7 +137,7 @@ async def analyze_sms(
     else:
         verdict = ScamVerdict.SAFE
 
-    # Category determination
+                            
     if phish_risk > sms_risk and phish_risk > 0.4:
         category = str(phishing_res.get("category", "PHISHING")).upper()
     elif sms_risk > 0.4 or len(red_flags) > 0:
@@ -145,7 +145,7 @@ async def analyze_sms(
     else:
         category = "SAFE"
 
-    # Build dynamic explanations
+                                
     exp_local, exp_en, advice = build_dynamic_explanations(text, lang, red_flags, verdict.value)
 
     return SMSCheckResponse(

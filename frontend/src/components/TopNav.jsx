@@ -1,5 +1,4 @@
 import React from 'react';
-import { Search, Bell, Globe } from 'lucide-react';
 
 const LANGUAGES = [
   { code: 'hi', label: 'हिंदी (Hindi)' },
@@ -15,9 +14,8 @@ const LANGUAGES = [
 export default function TopNav({ selectedLang, setSelectedLang }) {
   return (
     <header className="top-nav">
-      {/* Search Input Bar */}
-      <div style={{ position: 'relative', width: '320px' }}>
-        <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+            <div style={{ position: 'relative', width: '320px' }}>
+        
         <input
           type="text"
           className="gov-input"
@@ -29,12 +27,10 @@ export default function TopNav({ selectedLang, setSelectedLang }) {
         </span>
       </div>
 
-      {/* Right User Bar & Language Pill */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         
-        {/* Vernacular Language Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#F8FAFC', padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
-          <Globe size={15} color="var(--text-muted)" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#F8FAFC', padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
+          
           <select
             value={selectedLang}
             onChange={(e) => setSelectedLang(e.target.value)}
@@ -56,13 +52,11 @@ export default function TopNav({ selectedLang, setSelectedLang }) {
           </select>
         </div>
 
-        {/* Bell Icon */}
-        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
-          <Bell size={18} />
+                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
+          
         </button>
 
-        {/* User Profile Avatar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', borderLeft: '1px solid var(--border-light)', paddingLeft: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', borderLeft: '1px solid var(--border-light)', paddingLeft: '16px' }}>
           <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#F1F5F9', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '12px', color: '#0F172A' }}>
             JD
           </div>

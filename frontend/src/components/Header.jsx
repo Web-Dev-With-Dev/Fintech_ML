@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Activity, Globe, Zap } from 'lucide-react';
 import axios from 'axios';
 
 const LANGUAGES = [
@@ -31,52 +30,36 @@ export default function Header({ activeTab, setActiveTab, selectedLang, setSelec
   }, []);
 
   const navItems = [
-    { id: 'sms', label: 'SMS & Phishing', icon: Shield },
-    { id: 'upi', label: 'UPI Mule Network', icon: Zap },
-    { id: 'voice', label: 'Voice Interceptor', icon: Activity },
-    { id: 'loan', label: 'Loan Auditor', icon: Shield },
-    { id: 'panic', label: 'Panic Shield', icon: Activity },
-    { id: 'fl', label: 'Federated AI Map', icon: Globe },
-    { id: 'helpline', label: 'Helpline Kiosk', icon: Shield }
+    { id: 'sms', label: 'SMS & Phishing' },
+    { id: 'upi', label: 'UPI Mule Network' },
+    { id: 'voice', label: 'Voice Interceptor' },
+    { id: 'loan', label: 'Loan Auditor' },
+    { id: 'panic', label: 'Panic Shield' },
+    { id: 'fl', label: 'Federated AI Map' },
+    { id: 'helpline', label: 'Helpline Kiosk' }
   ];
 
   return (
     <header className="glass-card" style={{ margin: '16px 24px 0 24px', padding: '16px 24px', borderBottom: '1px solid var(--border-glass)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         
-        {/* Brand Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-cyan))',
-            padding: '10px',
-            borderRadius: '12px',
-            boxShadow: '0 0 15px rgba(99, 102, 241, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Shield size={26} color="#ffffff" />
+                <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h1 style={{ fontSize: '22px', fontWeight: '800', background: 'linear-gradient(90deg, #FFFFFF, #94A3B8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              FinShield AI
+            </h1>
+            <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-primary)', fontWeight: '700', border: '1px solid rgba(99, 102, 241, 0.4)' }}>
+              RURAL EDITION
+            </span>
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '22px', fontWeight: '800', background: 'linear-gradient(90deg, #FFFFFF, #94A3B8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                FinShield AI
-              </h1>
-              <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-primary)', fontWeight: '700', border: '1px solid rgba(99, 102, 241, 0.4)' }}>
-                RURAL EDITION
-              </span>
-            </div>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              Multi-Modal Privacy-Preserving Financial Scam Shield
-            </p>
-          </div>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+            Multi-Modal Privacy-Preserving Financial Scam Shield
+          </p>
         </div>
 
-        {/* System Health & Language Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           
-          {/* API Health Pill */}
-          <div style={{
+                    <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -98,9 +81,8 @@ export default function Header({ activeTab, setActiveTab, selectedLang, setSelec
             {health.status === 'healthy' ? 'ML Engine Online' : 'Backend Offline'}
           </div>
 
-          {/* Language Selector Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(15, 23, 42, 0.6)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-glass)' }}>
-            <Globe size={16} color="var(--accent-cyan)" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(15, 23, 42, 0.6)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-glass)' }}>
+            
             <select
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
@@ -126,11 +108,9 @@ export default function Header({ activeTab, setActiveTab, selectedLang, setSelec
 
       </div>
 
-      {/* Navigation Tabs */}
-      <nav style={{ display: 'flex', gap: '8px', marginTop: '18px', overflowX: 'auto', paddingBottom: '4px' }}>
+            <nav style={{ display: 'flex', gap: '8px', marginTop: '18px', overflowX: 'auto', paddingBottom: '4px' }}>
         {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
+                    const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
@@ -152,7 +132,7 @@ export default function Header({ activeTab, setActiveTab, selectedLang, setSelec
                 boxShadow: isActive ? '0 4px 15px rgba(99, 102, 241, 0.35)' : 'none'
               }}
             >
-              <Icon size={16} />
+              
               {item.label}
             </button>
           );

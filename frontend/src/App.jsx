@@ -16,14 +16,11 @@ export default function App() {
   return (
     <div className="app-container">
       
-      {/* Fixed Left Vertical Sidebar */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Main Content Area */}
-      <div className="main-content">
+            <div className="main-content">
         
-        {/* Dynamic Page Views */}
-        <main style={{ flex: 1 }}>
+                <main style={{ flex: 1 }}>
           {activeTab === 'overview' && <Overview setActiveTab={setActiveTab} />}
           {activeTab === 'sms' && <SMSScanner selectedLang={selectedLang} />}
           {activeTab === 'upi' && <UPIGraphVisualizer selectedLang={selectedLang} />}

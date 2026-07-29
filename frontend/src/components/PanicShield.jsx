@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Activity, AlertOctagon, Phone, RefreshCw } from 'lucide-react';
 import axios from 'axios';
 
 export default function PanicShield() {
@@ -52,10 +51,9 @@ export default function PanicShield() {
   return (
     <div style={{ padding: '32px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '24px', position: 'relative' }}>
       
-      {/* Simulation Controls */}
-      <div className="gov-card">
+            <div className="gov-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <Activity size={22} color="#000000" />
+          
           <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
             Behavioral Panic State Shield
           </h2>
@@ -65,8 +63,7 @@ export default function PanicShield() {
           Isolation Forest Anomaly Detector monitors user session parameters to catch panic state transfers under coercion.
         </p>
 
-        {/* Controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-main)', marginBottom: '6px', fontWeight: '600' }}>
               <span>Transaction Velocity (Transfers/hr)</span>
@@ -92,13 +89,12 @@ export default function PanicShield() {
         </div>
 
         <button className="btn-black" style={{ width: '100%', justifyContent: 'center' }} onClick={handleAnalyze} disabled={loading}>
-          <RefreshCw size={18} />
+          
           {loading ? 'Evaluating Isolation Forest Model...' : 'Simulate Session & Analyze Panic Score'}
         </button>
       </div>
 
-      {/* Results Panel */}
-      <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         {result ? (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
@@ -116,16 +112,14 @@ export default function PanicShield() {
               )}
             </div>
 
-            {/* Panic Score Dial */}
-            <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '20px', borderRadius: '12px', textAlign: 'center', marginBottom: '16px' }}>
+                        <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '20px', borderRadius: '12px', textAlign: 'center', marginBottom: '16px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>ISOLATION FOREST ANOMALY PANIC SCORE</span>
               <div style={{ fontSize: '42px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: result.panic_score >= 0.75 ? '#DC2626' : '#16A34A' }}>
                 {(result.panic_score * 100).toFixed(0)} / 100
               </div>
             </div>
 
-            {/* Anomaly Type */}
-            {result.anomaly_type && (
+                        {result.anomaly_type && (
               <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', padding: '14px', borderRadius: '10px', color: '#DC2626', fontSize: '13px', fontWeight: '600' }}>
                 ⚠️ Detected Session Anomalies: {result.anomaly_type}
               </div>
@@ -133,7 +127,7 @@ export default function PanicShield() {
           </div>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-            <Activity size={48} color="var(--text-subtle)" style={{ marginBottom: '16px' }} />
+            
             <h3 style={{ fontSize: '18px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '8px' }}>
               Behavioral Panic State Shield
             </h3>
@@ -144,11 +138,10 @@ export default function PanicShield() {
         )}
       </div>
 
-      {/* Emergency Soft-Block Interception Modal */}
-      {showModal && (
+            {showModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="gov-card" style={{ maxWidth: '480px', width: '100%', padding: '32px', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-            <AlertOctagon size={56} color="#DC2626" style={{ marginBottom: '16px' }} />
+            
             <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '12px' }}>
               सुरक्षा चेतावनी: सॉफ्ट-ब्लॉक (Intervention)
             </h2>
@@ -157,7 +150,7 @@ export default function PanicShield() {
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <a href="tel:1930" className="btn-black" style={{ flex: 1, justifyContent: 'center', background: '#DC2626' }}>
-                <Phone size={18} /> कॉल 1930 हेल्पलाइन
+                 कॉल 1930 हेल्पलाइन
               </a>
               <button className="btn-light" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setShowModal(false)}>
                 बंद करें (Close)

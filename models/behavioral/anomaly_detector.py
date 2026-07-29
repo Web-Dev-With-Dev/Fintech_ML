@@ -10,12 +10,12 @@ from sklearn.metrics import precision_score, recall_score, classification_report
 
 class BehavioralAnomalyDetector:
     FEATURE_COLUMNS = [
-        # Core behavioral features
+                                  
         'tx_count_1h', 'avg_amount_30d', 'current_amount', 'new_recipient',
         'time_of_day', 'day_of_week', 'account_age_days',
-        # Derived in engineer_features()
+                                        
         'amount_vs_avg_ratio', 'velocity_spike', 'balance_drain_ratio',
-        # PaySim real fraud signals (populated by load_and_adapt_paysim)
+                                                                        
         'balance_drain_pct', 'complete_wipeout', 'dest_was_empty', 'type_risk',
     ]
     
@@ -30,7 +30,7 @@ class BehavioralAnomalyDetector:
         )
         self.scaler = StandardScaler()
         self.is_trained = False
-        self._score_threshold = None   # set after training for predict_anomaly
+        self._score_threshold = None                                           
 
     def engineer_features(self, session_df: pd.DataFrame) -> pd.DataFrame:
         df = session_df.copy()
@@ -43,7 +43,7 @@ class BehavioralAnomalyDetector:
         df['velocity_spike']      = df['tx_count_1h']    / df['avg_hourly_tx_30d']
         df['balance_drain_ratio'] = df['current_amount'] / df['estimated_balance']
 
-        # PaySim fraud-signal features — fill with safe defaults if not present
+                                                                               
         if 'balance_drain_pct' not in df.columns:
             df['balance_drain_pct'] = df['balance_drain_ratio'].clip(0, 1)
         if 'complete_wipeout' not in df.columns:
@@ -51,7 +51,7 @@ class BehavioralAnomalyDetector:
         if 'dest_was_empty' not in df.columns:
             df['dest_was_empty']    = df.get('new_recipient', pd.Series(0, index=df.index)).astype(float)
         if 'type_risk' not in df.columns:
-            df['type_risk']         = 0.3   # neutral default
+            df['type_risk']         = 0.3                    
 
         return df
 
@@ -65,7 +65,7 @@ class BehavioralAnomalyDetector:
         print(f"Loading dataset from {dataset_path}...")
         df = pd.read_csv(dataset_path)
 
-        # ── Auto-detect contamination from real fraud rate ──────────────────
+                                                                              
         if 'label' in df.columns:
             real_fraud_rate     = float(df['label'].mean())
             auto_contamination  = float(np.clip(real_fraud_rate, 0.001, 0.1))
@@ -76,9 +76,9 @@ class BehavioralAnomalyDetector:
         print("Engineering features...")
         df = self.engineer_features(df)
 
-        # ── KEY FIX: Train Isolation Forest on NORMAL samples only ──────────
-        # Unsupervised anomaly detection learns what is "normal".
-        # Fraud samples will then score low (anomalous) at inference time.
+                                                                              
+                                                                 
+                                                                          
         if 'label' in df.columns:
             df_normal   = df[df['label'] == 0]
             df_fraud    = df[df['label'] == 1]
@@ -94,7 +94,7 @@ class BehavioralAnomalyDetector:
         print("Training Isolation Forest on normal data...")
         self.model.fit(X_scaled)
 
-        # ── Set threshold using fraud samples if available, else use percentile ──
+                                                                                   
         if len(df_fraud) > 0:
             X_fraud     = self.prepare_features(df_fraud)
             X_fraud_sc  = self.scaler.transform(X_fraud)
@@ -103,7 +103,7 @@ class BehavioralAnomalyDetector:
             normal_scores = self.model.score_samples(X_scaled)
             fraud_scores  = self.model.score_samples(X_fraud_sc)
 
-            # Threshold = midpoint between mean normal score and mean fraud score
+                                                                                 
             self._score_threshold = float(
                 (np.mean(normal_scores) + np.mean(fraud_scores)) / 2.0
             )
@@ -159,14 +159,14 @@ class BehavioralAnomalyDetector:
 
         raw_score = float(self.model.score_samples(X_scaled)[0])
 
-        # ── Use calibrated threshold for consistent is_anomaly detection ──────
+                                                                                
         if self._score_threshold is not None:
             is_anomaly = bool(raw_score < self._score_threshold)
         else:
-            # Fallback to model.predict if threshold not calibrated
+                                                                   
             is_anomaly = bool(self.model.predict(X_scaled)[0] == -1)
 
-        # Normalize: lower raw_score → higher anomaly_score (0–1)
+                                                                 
         normalized_anomaly_score = float(np.clip(-raw_score / 0.5, 0, 1))
 
         panic_score = self.compute_panic_score(session_data_enriched)
@@ -219,14 +219,14 @@ class BehavioralAnomalyDetector:
 
 
 
-# ─── Dataset paths ────────────────────────────────────────────────────────────
+                                                                                
 _BASE        = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 DATASET_DIR  = os.path.join(_BASE, 'datasets')
 
-# PaySim: PS_20174392719_1491204439457_log.csv
+                                              
 PAYSIM_CSV   = os.path.join(DATASET_DIR, 'PS_20174392719_1491204439457_log.csv')
 
-# IEEE-CIS Fraud Detection
+                          
 IEEE_DIR     = os.path.join(DATASET_DIR, 'IEEE fraud deetction')
 IEEE_TRAIN   = os.path.join(IEEE_DIR, 'train_transaction.csv')
 
@@ -248,25 +248,25 @@ def load_and_adapt_paysim(path: str, nrows: int = 100_000) -> pd.DataFrame:
     type_risk_map = {'TRANSFER': 0.8, 'CASH_OUT': 0.9, 'PAYMENT': 0.1, 'DEBIT': 0.2, 'CASH_IN': 0.05}
 
     df = pd.DataFrame()
-    # Original behavioral features
-    df['tx_count_1h']        = raw['step'] % 10 + 1            # proxy: more steps → more tx
+                                  
+    df['tx_count_1h']        = raw['step'] % 10 + 1                                         
     df['avg_amount_30d']     = raw['amount'].rolling(30, min_periods=1).mean().fillna(raw['amount'])
     df['current_amount']     = raw['amount']
-    df['new_recipient']      = (raw['oldbalanceDest'] == 0).astype(int)   # real signal!
+    df['new_recipient']      = (raw['oldbalanceDest'] == 0).astype(int)                 
     df['time_of_day']        = raw['step'] % 24
     df['day_of_week']        = (raw['step'] // 24) % 7
     df['account_age_days']   = (raw['step'] // 24).clip(lower=1)
     df['avg_hourly_tx_30d']  = 0.3
 
-    # ── REAL fraud signals from PaySim ───────────────────────────────────────
+                                                                               
     old_bal  = raw['oldbalanceOrg'].replace(0, eps)
     df['estimated_balance']  = old_bal
 
-    # amount_vs_avg_ratio & velocity_spike are computed in engineer_features()
-    # but we add raw fraud signals as extra features below:
-    df['balance_drain_pct']  = (raw['amount'] / old_bal).clip(0, 1)       # 1.0 = full drain
-    df['complete_wipeout']   = (raw['newbalanceOrig'] == 0).astype(float) # account fully emptied
-    df['dest_was_empty']     = (raw['oldbalanceDest'] == 0).astype(float) # mule account signal
+                                                                              
+                                                           
+    df['balance_drain_pct']  = (raw['amount'] / old_bal).clip(0, 1)                         
+    df['complete_wipeout']   = (raw['newbalanceOrig'] == 0).astype(float)                        
+    df['dest_was_empty']     = (raw['oldbalanceDest'] == 0).astype(float)                      
     df['type_risk']          = raw['type'].map(type_risk_map).fillna(0.3)
     df['label']              = raw['isFraud']
     return df
@@ -298,7 +298,7 @@ def load_and_adapt_ieee(path: str, nrows: int = 100_000) -> pd.DataFrame:
 if __name__ == '__main__':
     np.random.seed(42)
 
-    # ── Try loading real datasets (PaySim preferred, IEEE-CIS fallback) ───────
+                                                                                
     df_combined = None
 
     if os.path.exists(PAYSIM_CSV):
@@ -340,14 +340,14 @@ if __name__ == '__main__':
             [pd.DataFrame(normal_data), pd.DataFrame(anomaly_data)]
         ).sample(frac=1).reset_index(drop=True)
 
-    # ── Save temp CSV and train ───────────────────────────────────────────────
+                                                                                
     dataset_path = os.path.join(DATASET_DIR, '_behavioral_adapted.csv')
     df_combined.to_csv(dataset_path, index=False)
 
     detector = BehavioralAnomalyDetector(contamination='auto')
     detector.train(dataset_path)
 
-    # ── Evaluate using calibrated score threshold ─────────────────────────────
+                                                                                
     df_features = detector.engineer_features(df_combined)
     X           = detector.prepare_features(df_features)
     X_scaled    = detector.scaler.transform(X)
@@ -363,7 +363,7 @@ if __name__ == '__main__':
     print("Recall:",    recall_score(true_labels, pred_labels, zero_division=0))
     print("\nClassification Report:\n", classification_report(true_labels, pred_labels, zero_division=0))
 
-    # ── Save model ─────────────────────────────────────────────────────────────
+                                                                                 
     save_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..', 'saved', 'behavioral_anomaly_detector.pkl'
     )

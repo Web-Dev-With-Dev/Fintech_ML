@@ -79,10 +79,10 @@ class LoanScamDetector:
         """
         logger.info(f"Loading dataset from {dataset_path}...")
 
-        # ── Load CFPB Complaints dataset ──────────────────────────────────────
+                                                                                
         if os.path.exists(dataset_path):
             try:
-                # CFPB complaints.csv is very large — load a sample
+                                                                   
                 raw = pd.read_csv(
                     dataset_path, encoding='latin-1',
                     on_bad_lines='skip', nrows=50000,
@@ -91,7 +91,7 @@ class LoanScamDetector:
                 raw.columns = ['product', 'text']
                 raw = raw.dropna(subset=['text'])
 
-                # Label: 1=loan scam related, 0=other complaint
+                                                               
                 loan_keywords = [
                     'processing fee', 'advance fee', 'no credit check',
                     'guaranteed approval', 'upfront', 'no cibil', 'instant loan',
@@ -196,7 +196,7 @@ class LoanScamDetector:
 
 if __name__ == '__main__':
     _DATASET_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'datasets')
-    _COMPLAINTS_CSV = os.path.join(_DATASET_DIR, 'complaints.csv')   # CFPB Complaints dataset
+    _COMPLAINTS_CSV = os.path.join(_DATASET_DIR, 'complaints.csv')                            
 
     detector = LoanScamDetector()
     detector.train(_COMPLAINTS_CSV)

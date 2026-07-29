@@ -172,7 +172,7 @@ class TransactionGraphBuilder:
         logger.info(f"Fraud ring visualization saved to {output_path}")
 
 
-# ─── Dataset paths ────────────────────────────────────────────────────────────
+                                                                                
 import os as _os
 _BASE       = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..')
 DATASET_DIR = _os.path.join(_BASE, 'datasets')
@@ -202,7 +202,7 @@ def load_paysim_as_graph_df(path: str, nrows: int = 50_000) -> pd.DataFrame:
 if __name__ == '__main__':
     builder = TransactionGraphBuilder()
 
-    # ── Load real PaySim dataset ──────────────────────────────────────────────
+                                                                                
     if _os.path.exists(PAYSIM_CSV):
         logger.info(f"Loading PaySim from: {PAYSIM_CSV}")
         df = load_paysim_as_graph_df(PAYSIM_CSV, nrows=50_000)
@@ -218,15 +218,15 @@ if __name__ == '__main__':
             'is_fraud':    [1 if i % 10 == 0 else 0 for i in range(n)]
         })
 
-    # ── Build graph ───────────────────────────────────────────────────────────
+                                                                                
     G = builder.build_from_dataframe(df)
     logger.info(f"Graph: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
 
-    # ── Compute node features ─────────────────────────────────────────────────
+                                                                                
     node_features = builder.compute_node_features(G)
     logger.info(f"Node features shape: {node_features.shape}")
 
-    # ── Detect fraud patterns ─────────────────────────────────────────────────
+                                                                                
     hubs = builder.detect_star_topology(G, threshold_victims=5)
     logger.info(f"Star topology hubs (potential scammers): {len(hubs)} found")
     if hubs:

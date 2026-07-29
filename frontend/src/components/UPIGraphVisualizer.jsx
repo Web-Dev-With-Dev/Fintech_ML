@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Zap, ArrowRight, Network } from 'lucide-react';
 import axios from 'axios';
 
 const PRESET_TXS = [
@@ -80,10 +79,9 @@ export default function UPIGraphVisualizer() {
   return (
     <div style={{ padding: '32px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '24px' }}>
       
-      {/* Transaction Form Panel */}
-      <div className="gov-card">
+            <div className="gov-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <Zap size={22} color="#000000" />
+          
           <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
             UPI Money Mule & Network Inspector
           </h2>
@@ -93,8 +91,7 @@ export default function UPIGraphVisualizer() {
           Graph Attention Neural Network (GAT) evaluates money mule chain routing, star topologies, and fake collect traps.
         </p>
 
-        {/* Presets */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
           {PRESET_TXS.map((p, i) => (
             <button
               key={i}
@@ -109,13 +106,12 @@ export default function UPIGraphVisualizer() {
               }}
             >
               <span>{p.label}</span>
-              <ArrowRight size={14} color="#000000" />
+              
             </button>
           ))}
         </div>
 
-        {/* Inputs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
           <div>
             <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700' }}>SENDER VPA</label>
             <input className="gov-input" value={sender} onChange={e => setSender(e.target.value)} />
@@ -139,19 +135,17 @@ export default function UPIGraphVisualizer() {
         </div>
 
         <button className="btn-black" style={{ width: '100%', justifyContent: 'center' }} onClick={() => handleAnalyze()} disabled={loading}>
-          <Network size={18} />
+          
           {loading ? 'Evaluating Network Topology...' : 'Run GAT Graph Network Inspection'}
         </button>
 
       </div>
 
-      {/* Graph Visualizer & Output Panel */}
-      <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
         {result ? (
           <div>
-            {/* Header badges */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700' }}>GAT VERDICT</span>
                 <div style={{ marginTop: '4px' }}>
@@ -169,33 +163,27 @@ export default function UPIGraphVisualizer() {
               )}
             </div>
 
-            {/* SVG Money Mule Topology Canvas */}
-            <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px', marginBottom: '16px', position: 'relative' }}>
+                        <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px', marginBottom: '16px', position: 'relative' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#000000', display: 'block', marginBottom: '12px', letterSpacing: '0.05em' }}>
                 GRAPH ATTENTION NETWORK TOPOLOGY VISUALIZER
               </span>
 
               <svg width="100%" height="160" viewBox="0 0 400 160" style={{ overflow: 'visible' }}>
-                {/* Lines */}
-                <line x1="60" y1="80" x2="200" y2="80" stroke={result.mule_chain_detected ? '#DC2626' : '#2563EB'} strokeWidth="3" strokeDasharray={result.mule_chain_detected ? "4 4" : "none"} />
+                                <line x1="60" y1="80" x2="200" y2="80" stroke={result.mule_chain_detected ? '#DC2626' : '#2563EB'} strokeWidth="3" strokeDasharray={result.mule_chain_detected ? "4 4" : "none"} />
                 <line x1="200" y1="80" x2="340" y2="80" stroke={result.mule_chain_detected ? '#DC2626' : '#16A34A'} strokeWidth="3" />
                 <line x1="200" y1="80" x2="200" y2="20" stroke={result.mule_chain_detected ? '#D97706' : 'transparent'} strokeWidth="2" />
                 <line x1="200" y1="80" x2="200" y2="140" stroke={result.mule_chain_detected ? '#D97706' : 'transparent'} strokeWidth="2" />
 
-                {/* Node 1: Sender */}
-                <circle cx="60" cy="80" r="22" fill="#FFFFFF" stroke="#2563EB" strokeWidth="3" />
+                                <circle cx="60" cy="80" r="22" fill="#FFFFFF" stroke="#2563EB" strokeWidth="3" />
                 <text x="60" y="85" textAnchor="middle" fill="#000000" fontSize="10" fontWeight="bold">SENDER</text>
 
-                {/* Node 2: Target/Mule */}
-                <circle cx="200" cy="80" r="26" fill={result.mule_chain_detected ? "#DC2626" : "#16A34A"} stroke="#FFFFFF" strokeWidth="3" />
+                                <circle cx="200" cy="80" r="26" fill={result.mule_chain_detected ? "#DC2626" : "#16A34A"} stroke="#FFFFFF" strokeWidth="3" />
                 <text x="200" y="84" textAnchor="middle" fill="#FFFFFF" fontSize="10" fontWeight="bold">{result.mule_chain_detected ? "MULE" : "TARGET"}</text>
 
-                {/* Node 3: Beneficiary */}
-                <circle cx="340" cy="80" r="22" fill="#FFFFFF" stroke={result.mule_chain_detected ? "#DC2626" : "#16A34A"} strokeWidth="3" />
+                                <circle cx="340" cy="80" r="22" fill="#FFFFFF" stroke={result.mule_chain_detected ? "#DC2626" : "#16A34A"} strokeWidth="3" />
                 <text x="340" y="85" textAnchor="middle" fill="#000000" fontSize="10" fontWeight="bold">RECV</text>
 
-                {/* Additional Star Nodes if Mule */}
-                {result.mule_chain_detected && (
+                                {result.mule_chain_detected && (
                   <>
                     <circle cx="200" cy="20" r="12" fill="#D97706" />
                     <circle cx="200" cy="140" r="12" fill="#D97706" />
@@ -209,8 +197,7 @@ export default function UPIGraphVisualizer() {
               </div>
             </div>
 
-            {/* Graph Metrics */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
               <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', fontWeight: '700' }}>RISK SCORE</span>
                 <span style={{ fontSize: '18px', fontWeight: '800', color: result.risk_score > 0.7 ? '#DC2626' : '#16A34A' }}>{(result.risk_score * 100).toFixed(0)}%</span>
@@ -228,7 +215,7 @@ export default function UPIGraphVisualizer() {
           </div>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-            <Network size={48} color="var(--text-subtle)" style={{ marginBottom: '16px' }} />
+            
             <h3 style={{ fontSize: '18px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '8px' }}>
               Awaiting UPI Transaction
             </h3>

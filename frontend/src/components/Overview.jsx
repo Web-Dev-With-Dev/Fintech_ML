@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Zap, Users, FileText, Activity, ArrowRight, X, Download, ShieldAlert, PhoneCall } from 'lucide-react';
 import axios from 'axios';
 import { getScanHistory, addScanHistoryItem } from '../utils/scanLogger';
 
@@ -9,18 +8,15 @@ export default function Overview({ setActiveTab, selectedLang }) {
   const [selectedSession, setSelectedSession] = useState(null);
   const [realLatency, setRealLatency] = useState('Checking...');
 
-  // Form State
   const [sessionName, setSessionName] = useState('');
   const [category, setCategory] = useState('SMS Phishing');
   const [inputText, setInputText] = useState('');
   const [creating, setCreating] = useState(false);
 
-  // Load actual user scan history & measure real backend latency
   const refreshData = async () => {
     const history = getScanHistory();
     setSessions(history);
 
-    // Measure real API round-trip latency to FastAPI /health
     const start = performance.now();
     try {
       await axios.get('http://localhost:8000/api/v1/health');
@@ -35,7 +31,6 @@ export default function Overview({ setActiveTab, selectedLang }) {
     refreshData();
   }, []);
 
-  // Handle Create New Session with Real ML API Call
   const handleCreateSession = async (e) => {
     e.preventDefault();
     if (!sessionName.trim() || !inputText.trim()) return;
@@ -93,7 +88,6 @@ export default function Overview({ setActiveTab, selectedLang }) {
     }
   };
 
-  // Export CSV Data
   const handleExportCSV = () => {
     if (sessions.length === 0) return;
     const headers = ["Session ID", "Session Name", "Threat Category", "Verdict", "Risk Score", "Created Date", "Input Text"];
@@ -108,7 +102,6 @@ export default function Overview({ setActiveTab, selectedLang }) {
     document.body.removeChild(link);
   };
 
-  // 100% REAL COUNTS (Zero fake offsets)
   const totalScans = sessions.length;
   const scamsBlocked = sessions.filter(s => s.verdict === 'SCAM').length;
   const muleRings = sessions.filter(s => s.category && s.category.includes('UPI') && s.verdict === 'SCAM').length;
@@ -116,8 +109,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
   return (
     <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
-      {/* Page Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: '36px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '4px' }}>
             Overview
@@ -128,15 +120,14 @@ export default function Overview({ setActiveTab, selectedLang }) {
         </div>
 
         <button className="btn-black" onClick={() => setShowCreateModal(true)}>
-          <Plus size={16} /> Create Scan Session
+           Create Scan Session
         </button>
       </div>
 
-      {/* 4 REAL KPI Stat Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
         <div className="gov-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '600', marginBottom: '16px' }}>
-            <Zap size={16} />
+            
             <span>Total Scans Processed</span>
           </div>
           <div style={{ fontSize: '38px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', lineHeight: 1 }}>
@@ -146,7 +137,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
 
         <div className="gov-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '600', marginBottom: '16px' }}>
-            <Users size={16} />
+            
             <span>Scams Intercepted</span>
           </div>
           <div style={{ fontSize: '38px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: totalScans > 0 ? '#DC2626' : '#000000', lineHeight: 1 }}>
@@ -156,7 +147,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
 
         <div className="gov-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '600', marginBottom: '16px' }}>
-            <FileText size={16} />
+            
             <span>Mule Rings Tracked</span>
           </div>
           <div style={{ fontSize: '38px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', lineHeight: 1 }}>
@@ -166,7 +157,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
 
         <div className="gov-card" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '600', marginBottom: '16px' }}>
-            <Activity size={16} />
+            
             <span>API ML Latency</span>
           </div>
           <div style={{ fontSize: '38px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: realLatency === 'Offline' ? '#DC2626' : '#16A34A', lineHeight: 1 }}>
@@ -175,8 +166,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
         </div>
       </div>
 
-      {/* Recent Interceptions Table */}
-      <div className="gov-card" style={{ padding: '28px' }}>
+            <div className="gov-card" style={{ padding: '28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <h2 style={{ fontSize: '22px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
             Recent Interceptions ({sessions.length})
@@ -184,16 +174,15 @@ export default function Overview({ setActiveTab, selectedLang }) {
           
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <button className="btn-light" onClick={handleExportCSV} disabled={sessions.length === 0}>
-              <Download size={14} /> Export data
+               Export data
             </button>
             <button className="btn-light" style={{ border: 'none' }} onClick={() => setActiveTab('sms')}>
-              View All <ArrowRight size={14} />
+              View All 
             </button>
           </div>
         </div>
 
-        {/* Table / Empty State */}
-        {sessions.length > 0 ? (
+                {sessions.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
               <thead>
@@ -220,7 +209,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
                     <td style={{ padding: '16px', color: 'var(--text-muted)' }}>{session.date}</td>
                     <td style={{ padding: '16px', textAlign: 'right' }}>
                       <button className="btn-black" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => setSelectedSession(session)}>
-                        Open Session <ArrowRight size={12} />
+                        Open Session 
                       </button>
                     </td>
                   </tr>
@@ -230,7 +219,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)' }}>
-            <Zap size={40} color="var(--text-subtle)" style={{ marginBottom: '12px' }} />
+            
             <h3 style={{ fontSize: '18px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '6px' }}>
               No Scan Sessions Logged Yet
             </h3>
@@ -238,18 +227,17 @@ export default function Overview({ setActiveTab, selectedLang }) {
               Run a message, UPI, audio, or loan app scan in any tool tab or click below to execute your first live machine learning scan!
             </p>
             <button className="btn-black" onClick={() => setShowCreateModal(true)}>
-              <Plus size={16} /> Run Your First Live Scan
+               Run Your First Live Scan
             </button>
           </div>
         )}
       </div>
 
-      {/* CREATE SESSION MODAL */}
-      {showCreateModal && (
+            {showCreateModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="gov-card" style={{ maxWidth: '520px', width: '100%', padding: '28px', position: 'relative' }}>
             <button style={{ position: 'absolute', right: '20px', top: '20px', background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setShowCreateModal(false)}>
-              <X size={20} color="var(--text-muted)" />
+              
             </button>
 
             <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '8px' }}>
@@ -293,16 +281,15 @@ export default function Overview({ setActiveTab, selectedLang }) {
         </div>
       )}
 
-      {/* OPEN SESSION DETAIL MODAL */}
-      {selectedSession && (
+            {selectedSession && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="gov-card" style={{ maxWidth: '580px', width: '100%', padding: '28px', position: 'relative' }}>
             <button style={{ position: 'absolute', right: '20px', top: '20px', background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setSelectedSession(null)}>
-              <X size={20} color="var(--text-muted)" />
+              
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <ShieldAlert size={24} color="#000000" />
+              
               <div>
                 <h2 style={{ fontSize: '22px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
                   {selectedSession.name}
@@ -311,8 +298,7 @@ export default function Overview({ setActiveTab, selectedLang }) {
               </div>
             </div>
 
-            {/* Verdict Card */}
-            <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '12px', marginBottom: '16px' }}>
+                        <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '12px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)' }}>ML VERDICT & RISK SCORE</span>
                 {selectedSession.verdict === 'SCAM' ? <span className="badge-scam">🚨 SCAM DETECTED</span> : <span className="badge-safe">✅ SAFE TRANSACTION</span>}
@@ -322,29 +308,26 @@ export default function Overview({ setActiveTab, selectedLang }) {
               </div>
             </div>
 
-            {/* Input payload */}
-            <div style={{ marginBottom: '16px' }}>
+                        <div style={{ marginBottom: '16px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>INPUT PAYLOAD TEXT</span>
               <div style={{ background: '#FFFFFF', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '8px', fontSize: '13px', color: '#0F172A' }}>
                 "{selectedSession.text}"
               </div>
             </div>
 
-            {/* XAI Explanation */}
-            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '16px', borderRadius: '10px', marginBottom: '20px' }}>
+                        <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '16px', borderRadius: '10px', marginBottom: '20px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#1D4ED8', display: 'block', marginBottom: '4px' }}>EXPLAINABLE AI (XAI) REASONING</span>
               <p style={{ fontSize: '13px', lineHeight: '1.6', fontWeight: '600', color: '#0F172A' }}>
                 {selectedSession.xai}
               </p>
             </div>
 
-            {/* Action buttons */}
-            <div style={{ display: 'flex', gap: '12px' }}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
               <button className="btn-black" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setActiveTab(selectedSession.tab); setSelectedSession(null); }}>
-                Open Module Tool <ArrowRight size={16} />
+                Open Module Tool 
               </button>
               <a href="tel:1930" className="btn-black" style={{ flex: 1, justifyContent: 'center', background: '#DC2626', textDecoration: 'none' }}>
-                <PhoneCall size={16} /> Call Helpline 1930
+                 Call Helpline 1930
               </a>
             </div>
           </div>

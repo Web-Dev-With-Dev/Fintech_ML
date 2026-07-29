@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { PhoneCall, ShieldCheck, Send, MapPin, CheckCircle, Globe } from 'lucide-react';
 import axios from 'axios';
 
 const LANGUAGES = [
@@ -50,19 +49,17 @@ export default function HelplineKiosk({ selectedLang }) {
   return (
     <div style={{ padding: '32px', display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px' }}>
       
-      {/* Helpline Directory */}
-      <div className="gov-card">
+            <div className="gov-card">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <PhoneCall size={22} color="#000000" />
+            
             <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
               Emergency Cybercrime Helpline Directory
             </h2>
           </div>
 
-          {/* Dedicated Language Selector inside Helpline Card */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Globe size={18} color="#000000" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            
             <select
               className="gov-input"
               style={{ width: 'auto', padding: '6px 12px', fontSize: '13px', fontWeight: '700', background: '#FFFFFF' }}
@@ -80,8 +77,7 @@ export default function HelplineKiosk({ selectedLang }) {
           Official government emergency helpline numbers for financial cyber fraud, bank ombudsman, and digital payments.
         </p>
 
-        {/* Directory Grid */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {helplines.map((h, i) => (
             <div key={i} style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div>
@@ -99,17 +95,16 @@ export default function HelplineKiosk({ selectedLang }) {
                 className="btn-black"
                 style={{ padding: '8px 16px', background: '#DC2626', textDecoration: 'none', fontSize: '13px' }}
               >
-                <PhoneCall size={14} /> Call {h.number}
+                 Call {h.number}
               </a>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Community Scam Reporting Kiosk */}
-      <div className="gov-card">
+            <div className="gov-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <ShieldCheck size={22} color="#000000" />
+          
           <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
             Community Scam Reporting Kiosk
           </h2>
@@ -121,7 +116,7 @@ export default function HelplineKiosk({ selectedLang }) {
 
         {reportSubmitted ? (
           <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', padding: '24px', borderRadius: '12px', textAlign: 'center', color: '#16A34A' }}>
-            <CheckCircle size={40} style={{ marginBottom: '12px' }} />
+            
             <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '6px' }}>Scam Report Submitted!</h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
               Thank you for protecting your local community. Threat parameters logged to regional node.
@@ -142,7 +137,7 @@ export default function HelplineKiosk({ selectedLang }) {
             <div>
               <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700' }}>LOCATION (CITY / STATE)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={16} color="var(--text-muted)" />
+                
                 <input className="gov-input" value={reportLocation} onChange={e => setReportLocation(e.target.value)} />
               </div>
             </div>
@@ -153,7 +148,7 @@ export default function HelplineKiosk({ selectedLang }) {
             </div>
 
             <button type="submit" className="btn-black" style={{ width: '100%', justifyContent: 'center' }}>
-              <Send size={18} /> Submit Threat Report to Regional Node
+               Submit Threat Report to Regional Node
             </button>
           </form>
         )}

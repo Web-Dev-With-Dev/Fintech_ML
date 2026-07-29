@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle, HelpCircle, Volume2, PhoneCall, ShieldAlert, Send, Globe } from 'lucide-react';
 import axios from 'axios';
 
 const LANGUAGES = [
@@ -57,7 +56,6 @@ export default function SMSScanner({ selectedLang }) {
       });
       setResult(res.data);
 
-      // Log to live history
       try {
         const { addScanHistoryItem } = await import('../utils/scanLogger');
         addScanHistoryItem({
@@ -90,11 +88,10 @@ export default function SMSScanner({ selectedLang }) {
   return (
     <div style={{ padding: '32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
       
-      {/* Input Panel */}
-      <div className="gov-card">
+            <div className="gov-card">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <ShieldAlert size={22} color="#000000" />
+            
             <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
               Vernacular SMS & Phishing Scanner
             </h2>
@@ -105,10 +102,9 @@ export default function SMSScanner({ selectedLang }) {
           Paste any SMS, WhatsApp message, or tap a sample scam scenario below to scan with XGBoost & Explainable AI models.
         </p>
 
-        {/* Response Language Selection Bar */}
-        <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Globe size={18} color="#000000" />
+            
             <span style={{ fontSize: '13px', fontWeight: '700', color: '#000000' }}>Target Response Language:</span>
           </div>
           <select
@@ -128,8 +124,7 @@ export default function SMSScanner({ selectedLang }) {
           </select>
         </div>
 
-        {/* Preset Chips */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
           {PRESETS.map((p, idx) => (
             <button
               key={idx}
@@ -146,8 +141,7 @@ export default function SMSScanner({ selectedLang }) {
           ))}
         </div>
 
-        {/* Text Input */}
-        <textarea
+                <textarea
           className="gov-input"
           rows={6}
           value={text}
@@ -162,7 +156,7 @@ export default function SMSScanner({ selectedLang }) {
           disabled={loading}
           style={{ width: '100%', justifyContent: 'center' }}
         >
-          <Send size={18} />
+          
           {loading ? 'Analyzing Message with ML Models...' : `Scan Message (${LANGUAGES.find(l => l.code === currentLang)?.label})`}
         </button>
 
@@ -173,30 +167,27 @@ export default function SMSScanner({ selectedLang }) {
         )}
       </div>
 
-      {/* Output Panel */}
-      <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
         {result ? (
           <div>
-            {/* Header Result Badge */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '0.05em' }}>SCAM VERDICT</span>
                 <div style={{ marginTop: '4px' }}>
                   {result.verdict === 'SCAM' && (
-                    <span className="badge-scam"><AlertTriangle size={16} /> SCAM DETECTED</span>
+                    <span className="badge-scam"> SCAM DETECTED</span>
                   )}
                   {result.verdict === 'SUSPICIOUS' && (
-                    <span className="badge-suspicious"><HelpCircle size={16} /> SUSPICIOUS PATTERN</span>
+                    <span className="badge-suspicious"> SUSPICIOUS PATTERN</span>
                   )}
                   {result.verdict === 'SAFE' && (
-                    <span className="badge-safe"><CheckCircle size={16} /> SAFE MESSAGE</span>
+                    <span className="badge-safe"> SAFE MESSAGE</span>
                   )}
                 </div>
               </div>
 
-              {/* Category Badge */}
-              <div style={{ textAlign: 'right' }}>
+                            <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '0.05em' }}>CATEGORY</span>
                 <div style={{ fontSize: '14px', fontWeight: '800', color: '#000000', marginTop: '4px' }}>
                   {result.category}
@@ -204,8 +195,7 @@ export default function SMSScanner({ selectedLang }) {
               </div>
             </div>
 
-            {/* Risk Meter Progress Bar */}
-            <div style={{ marginBottom: '20px', background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                        <div style={{ marginBottom: '20px', background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
                 <span>Risk Probability Score</span>
                 <span style={{ color: result.risk_score > 0.7 ? 'var(--status-scam)' : result.risk_score > 0.4 ? 'var(--status-suspicious)' : 'var(--status-safe)' }}>
@@ -222,8 +212,7 @@ export default function SMSScanner({ selectedLang }) {
               </div>
             </div>
 
-            {/* Localized XAI Explanation Box */}
-            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '16px', borderRadius: '10px', marginBottom: '16px' }}>
+                        <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '16px', borderRadius: '10px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ fontSize: '11px', fontWeight: '700', color: '#1D4ED8', letterSpacing: '0.05em' }}>
                   EXPLAINABLE AI (XAI) REASONING [{currentLang.toUpperCase()}]
@@ -232,7 +221,7 @@ export default function SMSScanner({ selectedLang }) {
                   onClick={() => speakText(result.explanation_local || result.explanation_en)}
                   style={{ background: 'none', border: 'none', color: '#1D4ED8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700' }}
                 >
-                  <Volume2 size={16} /> Voice Read-Aloud
+                   Voice Read-Aloud
                 </button>
               </div>
 
@@ -246,8 +235,7 @@ export default function SMSScanner({ selectedLang }) {
               )}
             </div>
 
-            {/* Red Flags Trigger Chips */}
-            {result.red_flags && result.red_flags.length > 0 && (
+                        {result.red_flags && result.red_flags.length > 0 && (
               <div style={{ marginBottom: '16px' }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>DETECTED RISK TRIGGERS</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -260,8 +248,7 @@ export default function SMSScanner({ selectedLang }) {
               </div>
             )}
 
-            {/* Action Advice Box */}
-            <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '10px' }}>
+                        <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '10px' }}>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700' }}>RECOMMENDED USER ACTION</span>
               <p style={{ fontSize: '13px', color: 'var(--text-main)', fontWeight: '500' }}>
                 {result.action_advice}
@@ -271,7 +258,7 @@ export default function SMSScanner({ selectedLang }) {
           </div>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-            <ShieldAlert size={48} color="var(--text-subtle)" style={{ marginBottom: '16px' }} />
+            
             <h3 style={{ fontSize: '18px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '8px' }}>
               Ready to Scan Messages
             </h3>
@@ -281,8 +268,7 @@ export default function SMSScanner({ selectedLang }) {
           </div>
         )}
 
-        {/* Quick Emergency Call Button */}
-        <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-light)', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-light)', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>VICTIM OF FINANCIAL FRAUD?</span>
             <span style={{ fontSize: '13px', fontWeight: '700', color: '#000000' }}>Call National Cybercrime Portal</span>
@@ -292,7 +278,7 @@ export default function SMSScanner({ selectedLang }) {
             className="btn-black"
             style={{ padding: '8px 16px', background: '#DC2626', textDecoration: 'none', fontSize: '13px' }}
           >
-            <PhoneCall size={16} /> Dial 1930
+             Dial 1930
           </a>
         </div>
 

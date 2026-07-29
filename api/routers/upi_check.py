@@ -10,12 +10,12 @@ def evaluate_upi_risk(sender_id: str, receiver_id: str, amount: float, message_t
     r_id = (receiver_id or "").lower()
     msg = (message_text or "").lower()
 
-    # 1. Receiver VPA Risk Check
+                                
     mule_keywords = ["mule", "temp_chain", "mule_account", "mule_chain", "mule_temp"]
     has_mule_vpa = any(kw in r_id for kw in mule_keywords)
     has_suspicious_vpa = any(kw in r_id for kw in ["claim", "reward", "bonus", "winner", "prize", "lottery", "scam", "fraud"])
 
-    # 2. Payment Note / Message Text NLP Risk Check
+                                                   
     scam_msg_keywords = [
         "lottery", "processing", "pay immediately", "immediately", "kyc", "otp", "fee", 
         "win", "prize", "urgent", "claim", "reward", "advance", "pin", "cashback", "collect",
@@ -24,10 +24,10 @@ def evaluate_upi_risk(sender_id: str, receiver_id: str, amount: float, message_t
     ]
     found_msg_keywords = [kw for kw in scam_msg_keywords if kw in msg]
 
-    # 3. High Value Transaction Check
+                                     
     is_high_amount = amount >= 10000.0
 
-    # Base Risk Score calculation
+                                 
     base_risk = 0.05
     if has_mule_vpa:
         base_risk = max(base_risk, 0.95)
@@ -40,7 +40,7 @@ def evaluate_upi_risk(sender_id: str, receiver_id: str, amount: float, message_t
     if is_high_amount and (has_mule_vpa or found_msg_keywords):
         base_risk = min(1.0, base_risk + 0.08)
 
-    # Specific Fraud Type Classification
+                                        
     fraud_type = None
     if base_risk >= 0.45:
         if any(w in msg for w in ["hacker", "hackaer", "hack", "threat", "extortion", "money will go", "goene", "police"]):
@@ -55,10 +55,10 @@ def evaluate_upi_risk(sender_id: str, receiver_id: str, amount: float, message_t
             fraud_type = "SUSPICIOUS_UPI_TRANSFER"
 
 
-    # Mule chain detection is TRUE only for actual mule chains or high risk mule VPAs
+                                                                                     
     mule_chain_detected = (fraud_type == "MONEY_MULE_CHAIN") or has_mule_vpa
 
-    # Ring ID generation only for mule chains or high-risk mule VPAs
+                                                                    
     ring_id = None
     if mule_chain_detected:
         clean_r = re.sub(r'[^a-zA-Z0-9]', '', r_id)[:6].upper()

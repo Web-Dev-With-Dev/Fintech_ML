@@ -144,7 +144,7 @@ class LSTMAnomalyTrainer:
 
 
 
-# ─── Dataset paths ────────────────────────────────────────────────────────────
+                                                                                
 import os as _os
 _BASE       = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..')
 _DATASETS   = _os.path.join(_BASE, 'datasets')
@@ -169,7 +169,7 @@ def load_paysim_sequences(path: str, nrows: int = 50_000, seq_len: int = 10) -> 
     raw = pd.read_csv(path, nrows=nrows)
     print(f"PaySim loaded: {len(raw)} rows | Fraud: {raw['isFraud'].sum()} ({raw['isFraud'].mean():.2%})")
 
-    # Feature engineering
+                         
     raw['is_transfer']       = (raw['type'] == 'TRANSFER').astype(float)
     raw['is_cash_out']       = (raw['type'] == 'CASH_OUT').astype(float)
     raw['balance_diff_orig'] = raw['newbalanceOrig'] - raw['oldbalanceOrg']
@@ -200,7 +200,7 @@ def load_ieee_sequences(path: str, nrows: int = 50_000, seq_len: int = 10) -> tu
     raw = pd.read_csv(path, nrows=nrows, usecols=usecols).fillna(0)
     print(f"IEEE-CIS loaded: {len(raw)} rows | Fraud: {raw['isFraud'].sum()}")
 
-    # Build 10-feature representation
+                                     
     scaler = MinMaxScaler()
     feats  = pd.DataFrame(scaler.fit_transform(raw[['TransactionDT', 'TransactionAmt']]),
                           columns=['dt_norm', 'amt_norm'])
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     seq_len      = 10
     num_features = 10
 
-    # ── Load real dataset ─────────────────────────────────────────────────────
+                                                                                
     normal_seqs  = None
     anomaly_seqs = None
 
@@ -244,7 +244,7 @@ if __name__ == '__main__':
         normal_data  = pd.DataFrame(np.cumsum(np.random.randn(500, num_features), axis=0))
         trainer_tmp  = LSTMAnomalyTrainer(input_size=num_features, hidden_size=16, num_layers=1)
         normal_seqs  = trainer_tmp.prepare_sequences(normal_data, seq_len=seq_len)
-        # Simulate anomalies
+                            
         anomaly_data = normal_data.copy()
         anomaly_data.iloc[200:210, :] += 10.0
         anomaly_seqs = trainer_tmp.prepare_sequences(anomaly_data, seq_len=seq_len)[200:210]
@@ -252,15 +252,15 @@ if __name__ == '__main__':
     print(f"Normal sequences : {normal_seqs.shape}")
     print(f"Anomaly sequences: {anomaly_seqs.shape}")
 
-    # ── Train on normal sequences only (autoencoder learns normal patterns) ──
+                                                                               
     trainer = LSTMAnomalyTrainer(input_size=num_features, hidden_size=32, num_layers=2)
     trainer.train(normal_seqs, epochs=20, lr=0.001)
 
-    # ── Set anomaly threshold from normal reconstruction errors ───────────────
+                                                                                
     normal_errors = trainer.compute_reconstruction_error(normal_seqs)
     trainer.set_threshold(normal_errors, percentile=95.0)
 
-    # ── Evaluate ──────────────────────────────────────────────────────────────
+                                                                                
     print("\nTesting on normal sequence:")
     res_normal = trainer.predict_anomaly(normal_seqs[0])
     print(f"  Normal → {res_normal}")
@@ -270,7 +270,7 @@ if __name__ == '__main__':
         res_anomaly = trainer.predict_anomaly(anomaly_seqs[0])
         print(f"  Anomaly → {res_anomaly}")
 
-    # ── Save model ────────────────────────────────────────────────────────────
+                                                                                
     save_path = _os.path.join(
         _os.path.dirname(_os.path.abspath(__file__)), '..', 'saved', 'lstm_autoencoder.pt'
     )

@@ -13,7 +13,7 @@ class DynamicRuleFallback:
     def predict(self, text: str, lang: str = "en", *args, **kwargs) -> Any:
         t = text.lower() if isinstance(text, str) else ""
         
-        # Check suspicious keywords across languages
+                                                    
         scam_keywords = ['otp', 'winner', 'prize', 'lottery', 'arrest', 'blocked', 'kyc', 'suspend', 'urgent', 'turant', 'jald', 'inaam', 'jeet', 'bank account', 'update pan', 'aadhaar']
         found_keywords = [w for w in scam_keywords if w in t]
         has_url = 'http://' in t or 'https://' in t or '.com' in t or '.xyz' in t or 'bit.ly' in t
@@ -57,7 +57,7 @@ class ModelRegistry:
         logger.info(f"Loading models from {models_dir}")
         saved_dir = os.path.join(models_dir, "saved")
 
-        # 1. SMS Classifier
+                           
         try:
             from models.nlp.scam_sms_classifier import ScamSMSClassifier
             sms_model = ScamSMSClassifier()
@@ -70,7 +70,7 @@ class ModelRegistry:
             logger.warning(f"Failed to load ScamSMSClassifier: {e}. Using DynamicRuleFallback.")
             self.models['sms'] = DynamicRuleFallback("sms")
 
-        # 2. Phishing Detector
+                              
         try:
             from models.nlp.phishing_detector import PhishingDetector
             phish_model = PhishingDetector()
@@ -83,7 +83,7 @@ class ModelRegistry:
             logger.warning(f"Failed to load PhishingDetector: {e}. Using DynamicRuleFallback.")
             self.models['phishing'] = DynamicRuleFallback("phishing")
 
-        # 3. Loan Scam Detector
+                               
         try:
             from models.nlp.loan_scam_detector import LoanScamDetector
             loan_model = LoanScamDetector()
@@ -94,7 +94,7 @@ class ModelRegistry:
         except Exception as e:
             self.models['loan'] = DynamicRuleFallback("loan")
 
-        # 4. Behavioral Anomaly Detector
+                                        
         try:
             from models.behavioral.anomaly_detector import BehavioralAnomalyDetector
             beh_model = BehavioralAnomalyDetector()
@@ -105,7 +105,7 @@ class ModelRegistry:
         except Exception as e:
             self.models['behavior'] = DynamicRuleFallback("behavior")
 
-        # 5. Voice & Mule placeholders
+                                      
         self.models['voice'] = DynamicRuleFallback("voice")
         self.models['mule'] = DynamicRuleFallback("mule")
 

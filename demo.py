@@ -5,7 +5,7 @@ import joblib
 import pandas as pd
 import numpy as np
 
-# Force UTF-8 stream output for Windows console handling Indic scripts (Hindi/Tamil)
+                                                                                    
 if sys.platform == 'win32':
     try:
         sys.stdout.reconfigure(encoding='utf-8')
@@ -35,7 +35,7 @@ def print_banner(text, style="bold blue"):
     except:
         print(f"\n================ {text} ================")
 
-# Import actual FinShield models
+                                
 from models.nlp.scam_sms_classifier import ScamSMSClassifier
 from models.nlp.phishing_detector import PhishingDetector
 from models.nlp.loan_scam_detector import LoanScamDetector
@@ -51,7 +51,7 @@ class FinShieldDemo:
         self.anomaly_model = BehavioralAnomalyDetector()
         self.graph_builder = TransactionGraphBuilder()
 
-        # Load trained weights
+                              
         sms_path = os.path.join(self.saved_dir, 'scam_sms_classifier.pkl')
         if os.path.exists(sms_path):
             self.sms_model.load(sms_path)
@@ -78,7 +78,7 @@ class FinShieldDemo:
     def run_demo(self):
         console.print(Panel.fit("[bold green]FinShield AI: Real-Time Multi-Modal Financial Scam Detection Platform[/bold green]", subtitle="Live Model Execution Demo"))
         
-        # 1. Hindi SMS
+                      
         print_banner("Demo 1: Vernacular SMS Scam Interceptor (Hindi)")
         input_text_hi = "आपका SBI खाता बंद हो जाएगा। अभी OTP दें: 1930-XXXX"
         console.print(f"[bold]Input Text (Hindi):[/bold] {input_text_hi}")
@@ -90,7 +90,7 @@ class FinShieldDemo:
         console.print(f"[yellow]Triggered Red Flags:[/yellow] {res_hi['red_flags']}")
         console.print("[green]Vernacular Voice Explanation (Hindi):[/green] यह एक संदिग्ध संदेश है। अपना OTP किसी के साथ साझा न करें।")
 
-        # 2. Tamil SMS
+                      
         print_banner("Demo 2: Vernacular SMS Scam Interceptor (Tamil)")
         input_text_ta = "உங்கள் HDFC கணக்கு நிறுத்தப்படும். இப்போதே OTP கொடுங்கள்"
         console.print(f"[bold]Input Text (Tamil):[/bold] {input_text_ta}")
@@ -99,7 +99,7 @@ class FinShieldDemo:
         console.print(f"[bold red]Verdict: {res_ta['label']} (Confidence: {res_ta['confidence']:.2f})[/bold red]")
         console.print(f"[yellow]Triggered Red Flags:[/yellow] {res_ta['red_flags']}")
 
-        # 3. Phishing Detection
+                               
         print_banner("Demo 3: Real-Time Phishing Link & URL Analyzer")
         input_phish = "Urgent: Your bank account is suspended. Update KYC at http://bit.ly/fake"
         console.print(f"[bold]Input Text & URL:[/bold] {input_phish}")
@@ -112,7 +112,7 @@ class FinShieldDemo:
         console.print(f"[yellow]Text Flags:[/yellow] {res_phish['text_flags']}")
         console.print(f"[magenta]Category:[/magenta] {res_phish['category']}")
 
-        # 4. Loan Scam
+                      
         print_banner("Demo 4: Predatory Digital Lending & Loan Scam Detector")
         input_loan = "Need money? PM Mudra Instant offers 5 lakh loan. No CIBIL. WhatsApp only. Pay processing fee."
         console.print(f"[bold]Input Text:[/bold] {input_loan}")
@@ -122,7 +122,7 @@ class FinShieldDemo:
         console.print(f"[yellow]Warning Flags:[/yellow] {res_loan['warning_flags']}")
         console.print(f"[cyan]Regulatory Alert:[/cyan] {res_loan['regulatory_note']}")
 
-        # 5. Graph Analysis
+                           
         print_banner("Demo 5: UPI Transaction Graph Neural Network & Mule Chain Detection")
         paysim_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets', 'PS_20174392719_1491204439457_log.csv')
         if os.path.exists(paysim_path):
@@ -139,7 +139,7 @@ class FinShieldDemo:
             lat_graph = 115.0
             console.print("[bold red]Network Verdict: FRAUD RING DETECTED[/bold red]")
 
-        # 6. Behavioral Anomaly
+                               
         print_banner("Demo 6: Real-Time Behavioral Panic State Detector")
         sample_panic_session = {
             'tx_count_1h': 8,
@@ -164,7 +164,7 @@ class FinShieldDemo:
         console.print(f"[bold yellow]Panic Score: {res_anomaly['panic_score']} | Intervention Required: {res_anomaly['intervention_required']}[/bold yellow]")
         console.print(f"[cyan]Anomaly Type:[/cyan] {res_anomaly['anomaly_type']}")
 
-        # Real Live Performance Matrix
+                                      
         print_banner("Real Trained Model Performance Matrix")
         try:
             table = Table(title="FinShield AI Live Model Metrics (Evaluated on Real Datasets)")

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Activity, Mic, ShieldAlert, Play } from 'lucide-react';
 import axios from 'axios';
 
 const VOICE_PRESETS = [
@@ -64,10 +63,9 @@ export default function VoiceStudio({ selectedLang }) {
   return (
     <div style={{ padding: '32px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '24px' }}>
       
-      {/* Input Panel */}
-      <div className="gov-card">
+            <div className="gov-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <Activity size={22} color="#000000" />
+          
           <h2 style={{ fontSize: '24px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000' }}>
             Vernacular Voice Call Interceptor
           </h2>
@@ -77,8 +75,7 @@ export default function VoiceStudio({ selectedLang }) {
           OpenAI Whisper Speech Neural Net + Librosa Acoustic Pitch/Pause DSP Extractor.
         </p>
 
-        {/* Sample Call Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
           {VOICE_PRESETS.map((p, i) => (
             <button
               key={i}
@@ -90,13 +87,12 @@ export default function VoiceStudio({ selectedLang }) {
               }}
             >
               <span>{p.label}</span>
-              <Play size={14} color="#000000" />
+              
             </button>
           ))}
         </div>
 
-        {/* Input Field */}
-        <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '20px' }}>
           <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>
             AUDIO FILE URL OR RECORDING NAME
           </label>
@@ -104,13 +100,12 @@ export default function VoiceStudio({ selectedLang }) {
         </div>
 
         <button className="btn-black" style={{ width: '100%', justifyContent: 'center' }} onClick={() => handleAnalyze()} disabled={loading}>
-          <Mic size={18} />
+          
           {loading ? 'Transcribing & Analyzing Acoustic Features...' : 'Analyze Call Audio Recording'}
         </button>
       </div>
 
-      {/* Results Panel */}
-      <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="gov-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         {result ? (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
@@ -130,8 +125,7 @@ export default function VoiceStudio({ selectedLang }) {
               </span>
             </div>
 
-            {/* Audio Waveform Spectrum Animation */}
-            <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                        <div style={{ background: '#F8FAFC', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
                 ACOUSTIC SPECTRUM & VELOCITY SPECTROGRAM
               </span>
@@ -151,8 +145,7 @@ export default function VoiceStudio({ selectedLang }) {
               </div>
             </div>
 
-            {/* Transcript Box */}
-            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '16px', borderRadius: '10px', marginBottom: '16px' }}>
+                        <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '16px', borderRadius: '10px', marginBottom: '16px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#1D4ED8', display: 'block', marginBottom: '6px' }}>
                 REAL-TIME WHISPER TRANSCRIPTION
               </span>
@@ -161,8 +154,7 @@ export default function VoiceStudio({ selectedLang }) {
               </p>
             </div>
 
-            {/* Acoustic Anomaly Flags */}
-            {result.acoustic_flags && result.acoustic_flags.length > 0 && (
+                        {result.acoustic_flags && result.acoustic_flags.length > 0 && (
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>LIBROSA ACOUSTIC ANOMALIES</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -177,7 +169,7 @@ export default function VoiceStudio({ selectedLang }) {
           </div>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-            <Activity size={48} color="var(--text-subtle)" style={{ marginBottom: '16px' }} />
+            
             <h3 style={{ fontSize: '18px', fontWeight: '400', fontFamily: 'var(--font-serif)', color: '#000000', marginBottom: '8px' }}>
               Voice Interceptor Studio
             </h3>

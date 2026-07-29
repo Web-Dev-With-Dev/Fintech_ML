@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Light Enterprise / Official Government Theme */
+  
   --bg-page: #F4F5F7;
   --bg-sidebar: #FFFFFF;
   --bg-card: #FFFFFF;
@@ -64,7 +64,7 @@ h1, h2, h3, .serif-title {
   letter-spacing: -0.01em;
 }
 
-/* Sidebar Layout */
+
 .app-container {
   display: flex;
   min-height: 100vh;
@@ -93,7 +93,7 @@ h1, h2, h3, .serif-title {
   min-width: 0;
 }
 
-/* Top Navbar Header */
+
 .top-nav {
   height: 64px;
   background-color: #FFFFFF;
@@ -107,7 +107,7 @@ h1, h2, h3, .serif-title {
   z-index: 90;
 }
 
-/* Clean White Dashboard Cards */
+
 .gov-card {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -121,7 +121,7 @@ h1, h2, h3, .serif-title {
   box-shadow: var(--shadow-md);
 }
 
-/* Inputs & Form Controls */
+
 .gov-input {
   background: #FFFFFF;
   border: 1px solid var(--border-light);
@@ -140,7 +140,7 @@ h1, h2, h3, .serif-title {
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Official Action Buttons */
+
 .btn-black {
   background-color: var(--accent-black);
   color: #FFFFFF;
@@ -184,7 +184,7 @@ h1, h2, h3, .serif-title {
   border-color: #CBD5E1;
 }
 
-/* Verdict Badges */
+
 .badge-scam {
   background-color: var(--status-scam-bg);
   color: var(--status-scam);
@@ -224,7 +224,7 @@ h1, h2, h3, .serif-title {
   gap: 6px;
 }
 
-/* Sidebar Nav Item */
+
 .sidebar-link {
   display: flex;
   align-items: center;
@@ -254,7 +254,7 @@ h1, h2, h3, .serif-title {
   font-weight: 700;
 }
 
-/* Custom Scrollbar */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

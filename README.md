@@ -22,40 +22,40 @@ Over **500 million rural Indians** are entering the digital banking ecosystem fo
 
 ```mermaid
 graph TD
-    subgraph Frontend["React 18 + Vite Portal (http://localhost:5173)"]
-        UI[Vishleshan Official Government Dashboard]
-        SMS_UI[Vernacular SMS Interceptor]
-        UPI_UI[UPI Mule Graph Visualizer]
-        VOICE_UI[Voice Call Studio]
-        LOAN_UI[Loan App Auditor]
-        PANIC_UI[Behavioral Panic Shield]
-        FL_UI[Federated Learning Map]
-        HELP_UI[Helpline Directory & Kiosk]
+    subgraph Frontend["React 18 + Vite Portal"]
+        UI["Official Government Dashboard"]
+        SMS_UI["Vernacular SMS Interceptor"]
+        UPI_UI["UPI Mule Graph Visualizer"]
+        VOICE_UI["Voice Call Studio"]
+        LOAN_UI["Loan App Auditor"]
+        PANIC_UI["Behavioral Panic Shield"]
+        FL_UI["Federated Learning Map"]
+        HELP_UI["Helpline Directory and Kiosk"]
     end
 
-    subgraph API_Layer["FastAPI REST Backend (http://localhost:8000/api/v1)"]
-        SMS_ROUTER[POST /analyze/sms]
-        UPI_ROUTER[POST /analyze/upi]
-        AUDIO_ROUTER[POST /analyze/audio]
-        LOAN_ROUTER[POST /analyze/loan]
-        BEHAVIOR_ROUTER[POST /analyze/behavior]
-        HELP_ROUTER[GET /helplines]
-        HEALTH_ROUTER[GET /health]
+    subgraph API_Layer["FastAPI REST Backend"]
+        SMS_ROUTER["POST /analyze/sms"]
+        UPI_ROUTER["POST /analyze/upi"]
+        AUDIO_ROUTER["POST /analyze/audio"]
+        LOAN_ROUTER["POST /analyze/loan"]
+        BEHAVIOR_ROUTER["POST /analyze/behavior"]
+        HELP_ROUTER["GET /helplines"]
+        HEALTH_ROUTER["GET /health"]
     end
 
-    subgraph ML_Models["Trained Machine Learning & Deep Learning Models (models/saved/)"]
-        XGB[scam_sms_classifier.pkl - XGBoost NLP]
-        RF[phishing_detector.pkl - Random Forest]
-        GAT[gat_model.pt - PyTorch Graph Attention Net]
-        WHISPER[OpenAI Whisper Neural Net + Librosa DSP]
-        LOAN_MODEL[loan_scam_detector.pkl - RBI Auditor]
-        ISO[behavioral_anomaly_detector.pkl - Isolation Forest]
+    subgraph ML_Models["Trained Machine Learning Models"]
+        XGB["scam_sms_classifier.pkl - XGBoost NLP"]
+        RF["phishing_detector.pkl - Random Forest"]
+        GAT["gat_model.pt - PyTorch GAT"]
+        WHISPER["OpenAI Whisper + Librosa DSP"]
+        LOAN_MODEL["loan_scam_detector.pkl - RBI Auditor"]
+        ISO["behavioral_anomaly_detector.pkl - Isolation Forest"]
     end
 
-    subgraph Privacy_XAI["Vernacular XAI Engine & Privacy Layer"]
-        XAI[SHAP Vernacular Explainer - 8 Languages]
-        FL[Flower Federated Learning - 5 Regional Nodes]
-        DP[Gaussian Differential Privacy (ε=1.2, δ=10⁻⁵)]
+    subgraph Privacy_XAI["Vernacular XAI and Privacy Layer"]
+        XAI["SHAP Vernacular Explainer - 8 Languages"]
+        FL["Flower Federated Learning - 5 Regional Nodes"]
+        DP["Gaussian Differential Privacy (epsilon=1.2, delta=10^-5)"]
     end
 
     UI --> API_Layer

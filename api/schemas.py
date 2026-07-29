@@ -59,11 +59,19 @@ class HealthResponse(BaseModel):
 class SMSCheckRequest(BaseModel):
     text: str
     language: Optional[str] = None
+    lang: Optional[str] = None
+
+    def get_language(self) -> str:
+        return self.lang or self.language or "en"
 
 class AudioCheckRequest(BaseModel):
     audio_url: Optional[str] = None
     base64_audio: Optional[str] = None
     language: Optional[str] = None
+    lang: Optional[str] = None
+
+    def get_language(self) -> str:
+        return self.lang or self.language or "en"
 
 class UPICheckRequest(BaseModel):
     sender_id: str
@@ -75,12 +83,22 @@ class UPICheckRequest(BaseModel):
 class LoanCheckRequest(BaseModel):
     offer_text: str
     app_name: Optional[str] = None
-    language: str
+    language: Optional[str] = None
+    lang: Optional[str] = None
+
+    def get_language(self) -> str:
+        return self.lang or self.language or "en"
 
 class BehaviorCheckRequest(BaseModel):
     user_id: str
     session_data: Dict[str, Any]
-    language: str
+    language: Optional[str] = None
+    lang: Optional[str] = None
+
+    def get_language(self) -> str:
+        return self.lang or self.language or "en"
+
+
 
 class ReportRequest(BaseModel):
     text: str

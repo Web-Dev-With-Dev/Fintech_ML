@@ -9,7 +9,7 @@ from loguru import logger
 
 from .schemas import HealthResponse
 from .dependencies import get_model_registry
-from .routers import sms_check, upi_check, behavioral, voice_check, helplines
+from .routers import sms_check, upi_check, behavioral, voice_check, loan_check, helplines
 
 logger.add("logs/api.log", rotation="10 MB")
 start_time = time.time()
@@ -67,7 +67,9 @@ def create_app() -> FastAPI:
     app.include_router(upi_check.router, prefix="/api/v1")
     app.include_router(behavioral.router, prefix="/api/v1")
     app.include_router(voice_check.router, prefix="/api/v1")
+    app.include_router(loan_check.router, prefix="/api/v1")
     app.include_router(helplines.router, prefix="/api/v1")
+
 
     @app.get("/", tags=["System"])
     async def root():

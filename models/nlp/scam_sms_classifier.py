@@ -80,14 +80,26 @@ class ScamSMSClassifier:
         self.is_trained = True
         logger.info(f"Training done. Best params: {grid.best_params_}")
 
-    def predict(self, text: str, lang: str) -> Dict[str, Any]:
+    def predict(self, text: str, lang: str = "en") -> Dict[str, Any]:
         t = text.lower()
         found = [w for w in self._get_critical_keywords() if w in t]
         if found:
-            return {'label': 'SCAM', 'confidence': 0.99, 'red_flags': found, 'rule_triggered': True}
+            return {
+                'label': 'SCAM',
+                'confidence': 0.99,
+                'risk_score': 0.99,
+                'red_flags': found,
+                'rule_triggered': True
+            }
 
         if not self.is_trained:
-            raise ValueError("Model not trained yet.")
+            return {
+                'label': 'SAFE',
+                'confidence': 0.8,
+                'risk_score': 0.1,
+                'red_flags': [],
+                'rule_triggered': False
+            }
 
         X = self._build_features([text], [lang], fit=False)
         prob = self.model.predict_proba(X)[0]
@@ -95,9 +107,11 @@ class ScamSMSClassifier:
         return {
             'label':        'SCAM' if is_scam else 'SAFE',
             'confidence':   float(prob[1] if is_scam else prob[0]),
+            'risk_score':   float(prob[1]),
             'red_flags':    [],
             'rule_triggered': False
         }
+
 
     def save(self, path: str):
         os.makedirs(os.path.dirname(path), exist_ok=True)

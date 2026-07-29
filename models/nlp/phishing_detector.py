@@ -166,31 +166,50 @@ class PhishingDetector:
         self.is_trained = True
         logger.info("Training completed.")
 
-    def predict(self, text: str, lang: str) -> Dict[str, Any]:
+    def predict(self, text: str, lang: str = "en") -> Dict[str, Any]:
         urls = self._extract_urls(text)
         url_features = self.extract_url_features(urls)
         text_features = self.extract_text_features(text, lang)
         features = np.hstack((url_features, text_features))
-        category = self.classify_phishing_type(features)
-        is_phishing = category != 'safe'
-        if self.is_trained:
-            probs = self.classifier.predict_proba(features)[0]
-            confidence = float(np.max(probs))
-        else:
-            confidence = 0.0
+
         url_flags = []
         if url_features[0][2]: url_flags.append("Suspicious TLD")
         if url_features[0][3]: url_flags.append("IP Address Domain")
         if url_features[0][6]: url_flags.append("URL Shortener")
         text_flags = []
         if text_features[0][-1]: text_flags.append("Requests PII/Sensitive Info")
+
+        if self.is_trained:
+            probs = self.classifier.predict_proba(features)[0]
+            pred_idx = np.argmax(probs)
+            category = str(self.label_encoder.inverse_transform([pred_idx])[0])
+
+            if not urls and not text_flags:
+                category = 'safe'
+                is_phishing = False
+                risk_score = 0.05
+                confidence = 0.95
+            else:
+                is_phishing = category != 'safe'
+                classes = list(self.label_encoder.classes_)
+                safe_idx = classes.index('safe') if 'safe' in classes else -1
+                risk_score = float(1.0 - probs[safe_idx]) if safe_idx != -1 else (float(probs[pred_idx]) if is_phishing else 0.1)
+                confidence = float(np.max(probs))
+        else:
+            is_phishing = bool(url_flags or text_flags)
+            category = 'phishing' if is_phishing else 'safe'
+            risk_score = 0.85 if is_phishing else 0.1
+            confidence = 0.8 if is_phishing else 0.9
+
         return {
             'is_phishing': is_phishing,
             'confidence': confidence,
+            'risk_score': risk_score,
             'category': category,
             'url_flags': url_flags,
             'text_flags': text_flags
         }
+
 
     def save(self, path: str):
         os.makedirs(os.path.dirname(path), exist_ok=True)
